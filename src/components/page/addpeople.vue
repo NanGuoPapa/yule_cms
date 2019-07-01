@@ -24,56 +24,56 @@
         <div class="basic-big">
           <span class="basic-fill">*</span>
           <p class="basic-name">姓名</p>
-          <input class="basic-input" type="text" placeholder="请输入姓名">
+          <input class="basic-input" type="text" placeholder="请输入姓名" v-model="artistInfo.artist_name">
         </div>
       </div>
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill">*</span>
           <p class="basic-name">类型</p>
-          <input class="basic-input" type="text" placeholder="请输入艺人类型">
+          <input class="basic-input" type="text" placeholder="请输入艺人类型" v-model="artistInfo.artist_type">
         </div>
       </div>
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill">*</span>
           <p class="basic-name">简介</p>
-          <input class="basic-input" type="text" placeholder="请输入艺人简介">
+          <input class="basic-input" type="text" placeholder="请输入艺人简介" v-model="artistInfo.artist_introduction">
         </div>
       </div>
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">视频类型</p>
-          <input class="basic-input" type="text" placeholder="请输入艺人作品视频类型">
+          <input class="basic-input" type="text" placeholder="请输入艺人作品视频类型" v-model="artistInfo.video_type">
         </div>
       </div>
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">年龄</p>
-          <input class="basic-input" type="text" placeholder="请输入艺人年龄">
+          <input class="basic-input" type="number" placeholder="请输入艺人年龄" v-model="artistInfo.artist_age">
         </div>
       </div>
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">生日</p>
-          <input class="basic-input" type="text" placeholder="请输入艺人生日">
+          <input class="basic-input" type="date" placeholder="请输入艺人生日" v-model="artistInfo.birthday">
         </div>
       </div>
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">身高</p>
-          <input class="basic-input" type="text" placeholder="请输入艺人身高">
+          <input class="basic-input" type="number" placeholder="请输入艺人身高" v-model="artistInfo.artist_height">
         </div>
       </div>
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">体重</p>
-          <input class="basic-input" type="text" placeholder="请输入艺人体重">
+          <input class="basic-input" type="text" placeholder="请输入艺人体重" v-model="artistInfo.artist_name">
         </div>
       </div>
     </div>
@@ -87,14 +87,14 @@
         <div class="basic-big">
           <span class="basic-fill">*</span>
           <p class="basic-name">微博名称</p>
-          <input class="basic-input" type="text" placeholder="请输入微博名称">
+          <input class="basic-input" type="text" placeholder="请输入微博名称" v-model="artistInfo.weibo_name">
         </div>
       </div>
       <div class="contact">
         <div class="basic-big">
           <span class="basic-fill">*</span>
           <p class="basic-name">微博链接</p>
-          <input class="basic-input" type="text" placeholder="请输入微博链接">
+          <input class="basic-input" type="text" placeholder="请输入微博链接" v-model="artistInfo.weibo_link">
         </div>
       </div>
       <div class="contact">
@@ -147,19 +147,18 @@
           <p class="basic-name">艺人封面</p>
         </div>
       </div>
-      <div class="add-artist" :show-file-list="false" >
-        <img class="cover-artist" :src="coverFileArtist" @click="choiceCover" alt>
+      <div class="add-artist"  >
+        <img class="cover-artist" :src="coverFileArtist" @click="choiceCovers" alt>
         <input
           class="cover"
           type="file"
-          ref="choiceCoverElem"
+          ref="choiceCoverElems"
           @change="onCoverArtist"
           accept="image/*"
         >
         <span class="artist-addto">+</span>
         <span class="artist-addto">添加</span>
       </div>
-   
       <!-- 艺人写真 -->
       <div class="basic">
         <div class="basic-big">
@@ -241,7 +240,6 @@
           </div>
         </div>
       </div>
-
       <div class="modal" style="z-index: 2010;"></div>
     </div>
     <!-- 结束 -->
@@ -250,97 +248,120 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
-      coverFileReader: "",
-      coverFileArtist: "",
-      coverFilePortrait: "",
+      artist: '',
+      artistInfo: [],
+      coverFileReader: '',
+      coverFileArtist: '',
+      coverFilePortrait: '',
       isPerformerShow: false
-    };
+    }
+  },
+  mounted () {
+    this.artist = this.$route.query.artist
+    if (this.artist) {
+      let formData = new FormData()
+      formData.append('artist_id', this.artist) // 艺人id
+      this.$axios.request({
+        url: 'actionArtistDetailsApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        this.artistInfo = res.data.data
+      })
+    }
   },
   methods: {
-
-    onCoverChange(e) {
-      let _file = e.target.files[0];
+    onCoverChange (e) {
+      let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = "";
+        this.$refs.videoElem.value = ''
         this.toast = this.$createToast({
           time: 2000,
-          txt: "文件大小超过1M",
-          type: "txt"
-        });
-        this.toast.show();
-        return false;
+          txt: '文件大小超过1M',
+          type: 'txt'
+        })
+        this.toast.show()
+        return false
       } else {
-        this.cover = _file;
-        let _this = this;
+        this.cover = _file
+        let _this = this
         if (!e || !window.FileReader) {
-          return;
+          return
         } // 看支持不支持FileReader
-        let reader = new FileReader();
-        reader.readAsDataURL(_file);
-        reader.onloadend = function() {
-          _this.coverFileReader = this.result;
-        };
+        let reader = new FileReader()
+        reader.readAsDataURL(_file)
+        reader.onloadend = function () {
+          _this.coverFileReader = this.result
+        }
       }
     },
-    onCoverArtist(e) {
-      let _file = e.target.files[0];
+    onCoverArtist (e) {
+      let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = "";
+        this.$refs.videoElem.value = ''
         this.toast = this.$createToast({
           time: 2000,
-          txt: "文件大小超过1M",
-          type: "txt"
-        });
-        this.toast.show();
-        return false;
+          txt: '文件大小超过1M',
+          type: 'txt'
+        })
+        this.toast.show()
+        return false
       } else {
-        this.cover = _file;
-        let _this = this;
+        this.cover = _file
+        let _this = this
         if (!e || !window.FileReader) {
-          return;
+          return
         } // 看支持不支持FileReader
-        let reader = new FileReader();
-        reader.readAsDataURL(_file);
-        reader.onloadend = function() {
-          _this.coverFileArtist = this.result;
-        };
+        let reader = new FileReader()
+        reader.readAsDataURL(_file)
+        reader.onloadend = function () {
+          _this.coverFileArtist = this.result
+        }
       }
     },
-    onCoverPortrait(e) {
-      let _file = e.target.files[0];
+    onCoverPortrait (e) {
+      let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = "";
+        this.$refs.videoElem.value = ''
         this.toast = this.$createToast({
           time: 2000,
-          txt: "文件大小超过1M",
-          type: "txt"
-        });
-        this.toast.show();
-        return false;
+          txt: '文件大小超过1M',
+          type: 'txt'
+        })
+        this.toast.show()
+        return false
       } else {
-        this.cover = _file;
-        let _this = this;
+        this.cover = _file
+        let _this = this
         if (!e || !window.FileReader) {
-          return;
+          return
         } // 看支持不支持FileReader
-        let reader = new FileReader();
-        reader.readAsDataURL(_file);
-        reader.onloadend = function() {
-          _this.coverFilePortrait = this.result;
-        };
+        let reader = new FileReader()
+        reader.readAsDataURL(_file)
+        reader.onloadend = function () {
+          _this.coverFilePortrait = this.result
+        }
       }
     },
-    choiceCover() {
-      console.log("点击了上传视频");
-      this.$refs.choiceCoverElem.dispatchEvent(new MouseEvent("click"));
+    choiceCover () {
+      console.log('点击了上传视频')
+      this.$refs.choiceCoverElem.dispatchEvent(new MouseEvent('click'))
+    },
+    choiceCovers () {
+      console.log('点击了上传视频')
+      this.$refs.choiceCoverElems.dispatchEvent(new MouseEvent('click'))
+    },
+    closeCoverUpActor (){
+      console.log(123);
     }
   }
-};
+}
 </script>
 
 <style>
@@ -453,7 +474,7 @@ export default {
   text-align: center;
   object-fit: cover;
   position: absolute;
-  margin-left: -32px;
+  margin-left: -35.5px;
 }
 .add-back {
   width: 97px;
@@ -469,6 +490,7 @@ export default {
   margin-top: 58px;
   margin-left: -17px;
   position: absolute;
+  width: 60px;
 }
 .add-picter {
   font-size: 7px;
@@ -495,7 +517,7 @@ export default {
   text-align: center;
   object-fit: cover;
   position: absolute;
-  margin-left: -156px;
+  margin-left: -160px;
 }
 .artist-addto {
   font-size: 7px;
