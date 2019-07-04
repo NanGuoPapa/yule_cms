@@ -313,7 +313,6 @@ export default {
             data: formData
           })
           .then(res => {
-            this.isCoverUploadDialogShow = false
             console.log(res)
             if (res.data.code === 200) {
               alert('操作成功')
