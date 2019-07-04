@@ -38,6 +38,11 @@
             </tbody>
           </table>
         </div>
+        <el-pagination
+          @current-change="handleCurrentChange"
+          layout="prev, pager, next, jumper"
+          :total="eventPage.pageNumber * 10">
+        </el-pagination>
         <!-- 添加弹框 -->
         <div v-show="isMatchShow">
           <div class="elastic" style="z-index: 2011;">
@@ -113,6 +118,8 @@ export default {
       event_type: '',
       msgevent_type: '',
       isMatchShow: false,
+      eventPage: [],
+      pageCurrent: '',
       coverFilePortraitMatch: ''
     }
   },
@@ -199,6 +206,7 @@ export default {
     default (searchTitle = '') {
       let formData = new FormData()
       formData.append('title', searchTitle)
+      formData.append('pageCurrent', this.pageCurrent) // 当前页数
       this.$http
         .request({
           url: 'actionEventListApi',
@@ -208,6 +216,7 @@ export default {
         .then(res => {
           if (res.data.code === 200) {
             this.eventList = res.data.data.result
+            this.eventPage = res.data.data.PageList
           }
         })
     },
@@ -218,6 +227,7 @@ export default {
       }
       let formData = new FormData()
       formData.append('title', this.searchTitle)
+      formData.append('pageCurrent', this.pageCurrent) // 当前页数
       this.$http
         .request({
           url: 'actionEventListApi',
@@ -227,12 +237,14 @@ export default {
         .then(res => {
           if (res.data.code === 200) {
             this.eventList = res.data.data.result
+            this.eventPage = res.data.data.PageList
           }
         })
     },
     cancel () {
       this.searchTitle = ''
       let formData = new FormData()
+      formData.append('pageCurrent', this.pageCurrent) // 当前页数
       this.$http
         .request({
           url: 'actionEventListApi',
@@ -242,6 +254,7 @@ export default {
         .then(res => {
           if (res.data.code === 200) {
             this.eventList = res.data.data.result
+            this.eventPage = res.data.data.PageList
           }
         })
     },

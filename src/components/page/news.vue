@@ -39,6 +39,11 @@
         </div>
       </el-card>
     </div>
+    <el-pagination
+      @current-change="handleCurrentChange"
+      layout="prev, pager, next, jumper"
+      :total="eventPage.pageNumber * 10">
+    </el-pagination>
     <!-- 添加赛事弹框 -->
     <div v-show="isPerformerShow">
       <div class="elastic" style="z-index: 2011;">
@@ -102,6 +107,8 @@ export default {
       msgnews_introduction: '',
       msgcover_link: '',
       isPerformerShow: false,
+      newSPage: [],
+      pageCurrent: '',
       coverFilePortraitNews: ''
     }
   },
@@ -160,6 +167,7 @@ export default {
     },
     default (searchTitle = '') {
       let formData = new FormData()
+      formData.append('pageCurrent', this.pageCurrent) // 当前页数
       formData.append('title', searchTitle)
       this.$http
         .request({
@@ -170,6 +178,7 @@ export default {
         .then(res => {
           if (res.data.code === 200) {
             this.newsList = res.data.data.result
+            this.newsPage = res.data.data.PageList
           }
         })
     },
@@ -179,6 +188,7 @@ export default {
         return false
       }
       let formData = new FormData()
+      formData.append('pageCurrent', this.pageCurrent) // 当前页数
       formData.append('title', this.searchTitle)
       this.$http
         .request({
@@ -189,6 +199,7 @@ export default {
         .then(res => {
           if (res.data.code === 200) {
             this.newsList = res.data.data.result
+            this.newsPage = res.data.data.PageList
           }
         })
     },
@@ -217,6 +228,7 @@ export default {
     cancel () {
       this.searchTitle = ''
       let formData = new FormData()
+      formData.append('pageCurrent', this.pageCurrent) // 当前页数
       this.$http
         .request({
           url: 'actionNewsListApi',
@@ -225,6 +237,7 @@ export default {
         })
         .then(res => {
           if (res.data.code === 200) {
+            this.newsList = res.data.data.result
             this.newsList = res.data.data.result
           }
         })
