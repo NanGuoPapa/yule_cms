@@ -65,15 +65,15 @@
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill"></span>
-          <p class="basic-name">身高</p>
+          <p class="basic-name">身高(cm)</p>
           <input class="basic-input" type="number" placeholder="请输入艺人身高" v-model="artistInfo.artist_height">
         </div>
       </div>
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill"></span>
-          <p class="basic-name">体重</p>
-          <input class="basic-input" type="text" placeholder="请输入艺人体重" v-model="artistInfo.artist_name">
+          <p class="basic-name">体重(kg)</p>
+          <input class="basic-input" type="number" placeholder="请输入艺人体重" v-model="artistInfo.artist_weight">
         </div>
       </div>
     </div>
@@ -97,23 +97,29 @@
           <input class="basic-input" type="text" placeholder="请输入微博链接" v-model="artistInfo.weibo_link">
         </div>
       </div>
+        <div v-for="(item, index) in platforms">
       <div class="contact">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">平台名称</p>
-          <input class="basic-input" type="text" placeholder="请输入平台名称">
+          <input class="basic-input" type="text" placeholder="请输入平台名称" v-model="platforms[index].name">
         </div>
       </div>
       <div class="contact">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">平台链接</p>
-          <input class="basic-input" type="text" placeholder="请选平台链接">
+          <input class="basic-input" type="text" placeholder="请选平台链接" v-model="platforms[index].link">
         </div>
       </div>
-      <div class="add-input">
-        <span class="add-contact">添加</span>
+            <div class="add-input" @click="platform">
+                <span class="add-contact">添加</span>
+            </div>
+            <div style="margin-left: 50px;" class="add-input" @click="platformRemove(index)">
+                <span class="add-contact">删除</span>
+            </div>
       </div>
+
     </div>
     <!-- 照片和写真 -->
     <div class="information">
@@ -186,21 +192,24 @@
         <p class="information-news">获奖经历(选填)</p>
       </div>
       <div>
-        <p class="award-past">获奖经历 :</p>
-        <input class="award-input" type="text" placeholder="请输入获奖经历（如：2018 抖音嘉年华人气主播冠军）">
-        <p class="award-past">获奖经历 :</p>
-        <input class="award-input" type="text" placeholder="请输入获奖经历（如：2019 《音为校园》原唱赛道第一名））">
-        <div class="add-award">
+          <div v-for=" (item, index) in experiences">
+              <p class="award-past">获奖经历 :</p>
+              <input class="award-input" type="text" v-model="experiences[index]" placeholder="请输入获奖经历（如：2018 抖音嘉年华人气主播冠军）" >
+              <div class="add-awards" @click="experienceRemove(index)">
+                  <span class="award-button">删除</span>
+              </div>
+          </div>
+        <div class="add-award" @click="experience">
           <span class="award-button">添加</span>
         </div>
       </div>
     </div>
     <!-- 底部 -->
-    <router-link to="/HotWorks" v-if="true">
+    <!--<router-link to="/HotWorks" v-if="true">-->
       <div class="footers">
-        <span class="footer-preserve">保存并下一步</span>
+        <span class="footer-preserve" @click="artistAdd">保存并下一步</span>
       </div>
-    </router-link>
+    <!--</router-link>-->
     <div class="explain">
       <span>帮助</span>
       <span class="privacy">隐藏</span>
@@ -250,9 +259,13 @@
 export default {
   data () {
     return {
-      artist: '',
+      artist: 0,
       artistInfo: [],
+      platforms: [{ name: '', link: '' }], // 平台
+      experiences: [''], // 获奖经历
+      picfile: '',
       coverFileReader: '',
+      backfile: '',
       coverFileArtist: '',
       coverFilePortrait: '',
       isPerformerShow: false
@@ -269,11 +282,28 @@ export default {
         data: formData
       }).then((res) => {
         // 处理请求结果
-        this.artistInfo = res.data.data
+        this.artistInfo = res.data.data // 基本数据
+        console.log(res.data.data)
       })
     }
   },
   methods: {
+    // 添加平台信息文本框
+    platform () {
+      this.platforms.push({ name: '', link: '' })
+    },
+    // 删除平台信息文本框
+    platformRemove (index) {
+      this.platforms.splice(index, 1)
+    },
+    // 添加获奖经历文本框
+    experience () {
+      this.experiences.push([])
+    },
+    // 删除获奖经历文本框
+    experienceRemove (index) {
+      this.experiences.splice(index, 1)
+    },
     onCoverChange (e) {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
@@ -287,7 +317,7 @@ export default {
         this.toast.show()
         return false
       } else {
-        this.cover = _file
+        this.picfile = _file
         let _this = this
         if (!e || !window.FileReader) {
           return
@@ -312,7 +342,7 @@ export default {
         this.toast.show()
         return false
       } else {
-        this.cover = _file
+        this.backfile = _file
         let _this = this
         if (!e || !window.FileReader) {
           return
@@ -357,8 +387,45 @@ export default {
       console.log('点击了上传视频')
       this.$refs.choiceCoverElems.dispatchEvent(new MouseEvent('click'))
     },
-    closeCoverUpActor (){
-      console.log(123);
+    closeCoverUpActor () {
+      console.log(123)
+    },
+    artistAdd () {
+      let formData = new FormData()
+      formData.append('artist_id', this.artist) // 艺人id
+      formData.append('artist_name', this.artistInfo.artist_name) // 艺人姓名
+      formData.append('artist_age', this.artistInfo.artist_age) // 艺人年龄
+      formData.append('artist_height', this.artistInfo.artist_height) // 艺人身高
+      formData.append('artist_weight', this.artistInfo.artist_weight) // 艺人体重
+      formData.append('birthday', this.artistInfo.birthday) // 艺人生日
+      formData.append('weibo_name', this.artistInfo.weibo_name) // 微博名称
+      formData.append('weibo_link', this.artistInfo.weibo_link) // 微博链接
+      formData.append('artist_introduction', this.artistInfo.artist_introduction) // 艺人介绍
+      formData.append('artist_type', this.artistInfo.artist_type) // 艺人类型
+      formData.append('video_type', this.artistInfo.video_type) // 视频类型
+      formData.append('picfile', this.picfile) // 艺人首页展示图片
+      formData.append('backfile', this.backfile) // 艺人封面图片
+      formData.append('jphoto', this.artistInfo.photo) // 艺人写真（修改信息时必传的原json数据）
+      formData.append('platform', JSON.stringify(this.platforms)) // 平台信息
+      formData.append('award_experience', JSON.stringify(this.experiences)) // 艺人获奖经历
+      this.$axios.request({
+        url: 'actionArtistSaveApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        if (res.data.code === 200) {
+          alert(res.data.message)
+          this.$router.push({ path: '/HotWorks',
+            name: 'HotWorks',
+            query: {
+              artist: res.data.data.artist_id
+            }
+          })
+        } else {
+          alert(res.data.message)
+        }
+      })
     }
   }
 }
@@ -458,6 +525,7 @@ export default {
   background: rgba(230, 230, 230, 1);
   border-radius: 2px;
   margin-left: -96px;
+    cursor:pointer;
 }
 .add-contact {
   font-size: 7px;
@@ -571,6 +639,7 @@ export default {
   border-radius: 2px;
   margin: auto;
   margin-top: 22px;
+    cursor:pointer;
 }
 .award-button {
   font-size: 7px;
@@ -587,6 +656,7 @@ export default {
   border-radius: 2px;
   margin: auto;
   margin-top: 48px;
+    cursor:pointer;
 }
 .footer-preserve {
   font-size: 7px;
@@ -611,4 +681,16 @@ export default {
 .tiansin {
   padding-bottom: 48px;
 }
+    .add-awards {
+        width: 74px;
+        background: rgba(230, 230, 230, 1);
+        border-radius: 2px;
+        margin: auto;
+        display: inline-block;
+        float: left;
+        margin-top: -24px;
+        margin-left: 900px;
+        left: 100px;
+        cursor: pointer;
+    }
 </style>

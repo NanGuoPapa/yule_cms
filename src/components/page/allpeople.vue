@@ -5,7 +5,7 @@
                 <span>所有艺人：</span>
                 <input placeholder="请输入姓名" type="text" v-model="sear">
                 <span class="query" @click="Search">查询</span>
-                <span class="cancel-bac">取消</span>
+                <span class="cancel-bac" @click="emptySearch">取消</span>
                 <span @click="add" class="add">添加艺人</span>
             </div>
         </div>
@@ -24,22 +24,29 @@
                         </tr>
                         </thead>
                         <tbody class="contents" v-for="(item,index) in people">
-                        <tr>
-                            <td>{{item.id}}</td>
-                            <td>{{item.artist_name}}</td>
-                            <td>{{item.weibo_name}}</td>
-                            <td>{{item.ctime}}</td>
-                            <td>{{item.artist_introduction}}</td>
-                            <td class="look">
-                                <a href="" @click="Details">查看详情 </a>
-                                <a href="" @click="Edit(item.id)">编辑</a>
-                                <a href="" @click="Deletes(item.id,index)">删除</a>
-                                <a href="" @click="Recommend(item.id, item.is_push)" v-if="item.is_push == 0">推荐</a>
-                                <a href="" @click="Recommend(item.id, item.is_push)" v-else>取消推荐</a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td>{{(peoplePage.pageCurrent - 1) * peoplePage.pageSize + 1 + index}}</td>
+                                <td>{{item.artist_name}}</td>
+                                <td>{{item.weibo_name}}</td>
+                                <td>{{item.ctime}}</td>
+                                <td>{{item.artist_introduction}}</td>
+                                <td class="look">
+                                    <a href="" @click="Details">查看详情 </a>
+                                    <a href="" @click="Edit(item.id)">编辑</a>
+                                    <a href="" @click="Deletes(item.id,index)">删除</a>
+                                    <a href="" @click="Recommend(item.id, item.is_push)" v-if="item.is_push == 0">推荐</a>
+                                    <a href="" @click="Recommend(item.id, item.is_push)" v-else>取消推荐</a>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
+                    <div class="block">
+                        <el-pagination
+                                @current-change="handleCurrentChange"
+                                layout="prev, pager, next, jumper"
+                                :total="peoplePage.pageNumber * 10">
+                        </el-pagination>
+                    </div>
                 </div>
             </el-card>
         </div>
@@ -51,24 +58,36 @@ export default {
   data () {
     return {
       people: [],
-      sear: ''
+      peoplePage: [],
+      sear: '',
+      pageCurrent: ''
     }
   },
   methods: {
+    // 分页请求
+    handleCurrentChange (val) {
+      this.pageCurrent = val
+      this.Search()
+    },
+    // 清空操作
+    emptySearch () {
+      this.sear = ''
+      this.Search()
+    },
     // 搜索艺人
     async Search () {
       let formData = new FormData()
       formData.append('artist_name', this.sear) // 艺人姓名
-      if (this.sear) {
-        this.$axios.request({
-          url: 'actionArtistListApi',
-          method: 'POST',
-          data: formData
-        }).then((res) => {
-          // 处理请求结果
-          this.people = res.data.data.result
-        })
-      }
+      formData.append('pageCurrent', this.pageCurrent) // 当前页数
+      this.$axios.request({
+        url: 'actionArtistListApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        this.people = res.data.data.result
+        this.peoplePage = res.data.data.PageList
+      })
     },
     // 添加艺人
     async add () {
@@ -141,6 +160,7 @@ export default {
     }).then((res) => {
       // 处理请求结果
       this.people = res.data.data.result
+      this.peoplePage = res.data.data.PageList
     })
   }
 }

@@ -14,33 +14,55 @@
       </span>
     </div>
     <!-- 热门作品 -->
-    <div class="hots-work">
+    <el-card style="margin:15px;">
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">热门作品 (选填)</p>
         </div>
       </div>
-      <img class="cover-all" alt>
-      <div class="add-back" @click="artistCoverHot">
-        <span class="add-picter">+</span>
-        <span class="add-picter">添加</span>
+      <div class="details" name="myComponent">
+        <ul>
+          <li>
+            <el-button type="text">
+              <div @click="artistCoverHot" class="upload">+ 添加</div>
+            </el-button>
+          </li>
+          <li v-for="item in WorkList">
+            <div class="details-news" @click="artistCoverHot(item.id)">
+              <div class="img">
+                <img :src="item.works_cover" alt style="width: 100%;height: 100%;">
+              </div>
+            </div>
+          </li>
+        </ul>
       </div>
-    </div>
+    </el-card>
     <!-- 出席活动 -->
-    <div class="hots-work">
+    <el-card style="margin:15px;">
       <div class="basic">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">出席活动 (选填)</p>
         </div>
       </div>
-      <img class="attend-cover" alt>
-      <div class="attend" @click="artistCoverHotPicter">
-        <span class="attend-active">+</span>
-        <span class="attend-active">添加</span>
+      <div class="details" name="myComponent">
+        <ul>
+          <li>
+            <el-button type="text">
+              <div @click="artistCoverHotPicter" class="upload" style="text-align:center;width: 135px;height: 101px;">+ 添加</div>
+            </el-button>
+          </li>
+          <li v-for="item in EventList">
+            <div class="details-news" style="width: 135px;height: 101px;" @click="artistCoverHotPicter(item.id)">
+              <div class="img">
+                <img :src="item.event_cover" alt style="width: 135px;height: 101px;">
+              </div>
+            </div>
+          </li>
+        </ul>
       </div>
-    </div>
+    </el-card>
     <!-- 保存 -->
     <div class="keep">
       <span class="keep-works">保存</span>
@@ -49,7 +71,7 @@
       <p class="tiansins">copyright 2019 北京天率科技有限公司出品</p>
     </div>
     <!-- 添加热门作品封面弹窗 -->
-    <div v-show="isPerformerShowHot">
+   <div v-show="isPerformerShowHot">
       <div class="elastic" style="z-index: 2011;">
         <div class="border-bott">
           <span class="addmatch">添加热门作品</span>
@@ -58,13 +80,12 @@
         <div class="content-news">
           <span class="must">*</span>
           <span class="news">作品名称 :</span>
-          <input class="butto" type="text" placeholder="请输入跳转链接">
+          <input class="butto" type="text" placeholder="请输入作品名称" v-model="WorkDetail.works">
         </div>
         <div class="content-news">
           <span class="must"></span>
           <span class="news">备注说明 :</span>
-          <!-- <input class="entering" type="text" placeholder="请输入赛事名称"> -->
-          <textarea class="entering" cols="330" rows="81" placeholder="请输入备注信息"></textarea>
+          <textarea class="entering" cols="330" rows="81" placeholder="请输入备注信息" v-model="WorkDetail.remarks"></textarea>
         </div>
         <div class="content-top">
           <span class="must">*</span>
@@ -89,8 +110,8 @@
             <img class="coverhot" :src="coverFileHots" @click="choiceCover" alt>
           </div>
           <div class="footer">
-            <span class="abolish">取消</span>
-            <span class="determine">确定</span>
+            <span class="abolish" @click="closeCoverUpHot">取消</span>
+            <span class="determine" @click="SaveWorkList">确定</span>
           </div>
         </div>
       </div>
@@ -108,18 +129,18 @@
         <div class="content-news">
           <span class="must">*</span>
           <span class="news">活动标题 :</span>
-          <input class="butto" type="text" placeholder="请输入活动标题">
+          <input class="butto" type="text" placeholder="请输入活动标题" v-model="EventDetail.title">
         </div>
         <div class="content-news">
           <span class="must">*</span>
           <span class="news">跳转链接 :</span>
-          <input class="butto" type="text" placeholder="请输入跳转链接">
+          <input class="butto" type="text" placeholder="请输入跳转链接" v-model="EventDetail.jump_link">
         </div>
         <div class="content-news">
           <span class="must"></span>
           <span class="news">备注说明 :</span>
           <!-- <input class="entering" type="text" placeholder="请输入赛事名称"> -->
-          <textarea class="entering" cols="330" rows="81" placeholder="请输入备注信息"></textarea>
+          <textarea class="entering" cols="330" rows="81" placeholder="请输入备注信息" v-model="EventDetail.remarks"></textarea>
         </div>
         <div class="content-top">
           <span class="must">*</span>
@@ -133,8 +154,8 @@
             <img class="pict" :src="coverFilePortrait" @click="choiceCover" alt>
           </div>
           <div class="footer">
-            <span class="abolish">取消</span>
-            <span class="determine">确定</span>
+            <span class="abolish" @click="closeCoverUpHotPicter">取消</span>
+            <span class="determine" @click="SaveEventList">确定</span>
           </div>
         </div>
       </div>
@@ -147,119 +168,300 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
+      artist: 0, // 艺人id
+      work: 0, // 热门作品id
+      event: 0, // 参加活动id
+      WorkList: [], // 艺人热门作品列表
+      WorkDetail: [], // 艺人热门作品详情
+      EventList: [], // 艺人参加活动列表
+      EventDetail: [], // 艺人参加活动详情
       isPerformerShowHot: false,
       isPerformerShowHotPicter: false,
-      coverFilePortrait: "",
-      coverFileHot: "",  //封面
-      coverFileHots: ""  //视频
-    };
+      coverFilePortrait: '', // 活动图片（预览）
+      eventPic: '', // 活动封面图文件
+      coverFileHot: '', // 封面（预览）
+      workPic: '', // 作品封面图文件
+      coverFileHots: '', // 视频（预览）
+      workVideo: '' // 视频文件
+    }
+  },
+  mounted () {
+    this.artist = this.$route.query.artist
+    let formData = new FormData()
+    formData.append('artist_id', this.artist) // 艺人id
+    // 热门作品列表
+    this.$axios.request({
+      url: 'actionArtistWorkListApi',
+      method: 'POST',
+      data: formData
+    }).then((res) => {
+      // 处理请求结果
+      this.WorkList = res.data.data // 基本数据
+      console.log(this.WorkList)
+    })
+    // 出席活动列表
+    this.$axios.request({
+      url: 'actionArtistEventListApi',
+      method: 'POST',
+      data: formData
+    }).then((res) => {
+      // 处理请求结果
+      this.EventList = res.data.data // 基本数据
+      console.log(this.EventList)
+    })
   },
   methods: {
     // 点击显示弹窗
-    artistCoverHot() {
-      this.isPerformerShowHot = true;
+    artistCoverHot (id) {
+      if (id) {
+        this.work = id
+      }
+      this.isPerformerShowHot = true
+      this.WorkDetails()
     },
     // 关闭上传封面弹窗
-    closeCoverUpHot() {
-      this.isPerformerShowHot = false;
+    closeCoverUpHot () {
+      this.work = 0
+      this.isPerformerShowHot = false
+    },
+    // 热门作品详情
+    WorkDetails () {
+      let formData = new FormData()
+      formData.append('work_id', this.work) // 艺人id
+      if (this.work) {
+        this.$axios.request({
+          url: 'actionArtistWorkDetailsApi',
+          method: 'POST',
+          data: formData
+        }).then((res) => {
+          // 处理请求结果
+          this.WorkDetail = res.data.data // 基本数据
+          this.work = res.data.data.id // 热门作品id
+          this.coverFileHot = res.data.data.works_cover // 视频封面
+          this.coverFileHots = res.data.data.works_link // 视频文件
+        })
+      }
     },
     // 点击显示弹窗
-    artistCoverHotPicter() {
-      this.isPerformerShowHotPicter = true;
+    artistCoverHotPicter (id) {
+      if (id) {
+        this.event = id
+      }
+      this.isPerformerShowHotPicter = true
+      this.EventDetails()
     },
     // 关闭上传封面弹窗
-    closeCoverUpHotPicter() {
-      this.isPerformerShowHotPicter = false;
+    closeCoverUpHotPicter () {
+      this.event = 0
+      this.isPerformerShowHotPicter = false
+    },
+    // 出席活动详情
+    EventDetails (id) {
+      let formData = new FormData()
+      formData.append('event_id', this.event) // 艺人id
+      if (this.event) {
+        this.$axios.request({
+          url: 'actionArtistEventDetailsApi',
+          method: 'POST',
+          data: formData
+        }).then((res) => {
+          // 处理请求结果
+          this.EventDetail = res.data.data // 基本数据
+          this.event = res.data.data.id // 出席活动id
+          this.coverFilePortrait = res.data.data.event_cover // 活动图片
+        })
+      }
     },
     // 上传出席活动封面
-    onCoverPortrait(e) {
-      let _file = e.target.files[0];
+    onCoverPortrait (e) {
+      let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = "";
+        this.$refs.videoElem.value = ''
         this.toast = this.$createToast({
           time: 2000,
-          txt: "文件大小超过1M",
-          type: "txt"
-        });
-        this.toast.show();
-        return false;
+          txt: '文件大小超过1M',
+          type: 'txt'
+        })
+        this.toast.show()
+        return false
       } else {
-        this.cover = _file;
-        let _this = this;
+        this.eventPic = _file
+        let _this = this
         if (!e || !window.FileReader) {
-          return;
+          return
         } // 看支持不支持FileReader
-        let reader = new FileReader();
-        reader.readAsDataURL(_file);
-        reader.onloadend = function() {
-          _this.coverFilePortrait = this.result;
-        };
+        let reader = new FileReader()
+        reader.readAsDataURL(_file)
+        reader.onloadend = function () {
+          _this.coverFilePortrait = this.result
+        }
       }
     },
     // 上传热门作品视频
-    onCoverHots(e) {
-      let _file = e.target.files[0];
+    onCoverHots (e) {
+      let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = "";
+        this.$refs.videoElem.value = ''
         this.toast = this.$createToast({
           time: 2000,
-          txt: "文件大小超过1M",
-          type: "txt"
-        });
-        this.toast.show();
-        return false;
+          txt: '文件大小超过1M',
+          type: 'txt'
+        })
+        this.toast.show()
+        return false
       } else {
-        this.cover = _file;
-        let _this = this;
+        this.workVideo = _file
+        let _this = this
         if (!e || !window.FileReader) {
-          return;
+          return
         } // 看支持不支持FileReader
-        let reader = new FileReader();
-        reader.readAsDataURL(_file);
-        reader.onloadend = function() {
-          _this.coverFileHots = this.result;
-        };
+        let reader = new FileReader()
+        reader.readAsDataURL(_file)
+        reader.onloadend = function () {
+          _this.coverFileHots = this.result
+        }
       }
     },
     // 上传热门作品封面
-    onCoverHot(e) {
-      let _file = e.target.files[0];
+    onCoverHot (e) {
+      let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = "";
+        this.$refs.videoElem.value = ''
         this.toast = this.$createToast({
           time: 2000,
-          txt: "文件大小超过1M",
-          type: "txt"
-        });
-        this.toast.show();
-        return false;
+          txt: '文件大小超过1M',
+          type: 'txt'
+        })
+        this.toast.show()
+        return false
       } else {
-        this.cover = _file;
-        let _this = this;
+        this.workPic = _file
+        let _this = this
         if (!e || !window.FileReader) {
-          return;
+          return
         } // 看支持不支持FileReader
-        let reader = new FileReader();
-        reader.readAsDataURL(_file);
-        reader.onloadend = function() {
-          _this.coverFileHot = this.result;
-        };
+        let reader = new FileReader()
+        reader.readAsDataURL(_file)
+        reader.onloadend = function () {
+          _this.coverFileHot = this.result
+        }
       }
     },
-    choiceCover() {
-      console.log("点击了上传视频");
-      this.$refs.choiceCoverElem.dispatchEvent(new MouseEvent("click"));
+    choiceCover () {
+      console.log('点击了上传视频')
+      this.$refs.choiceCoverElem.dispatchEvent(new MouseEvent('click'))
+    },
+    // 艺人热门作品添加修改操作
+    SaveWorkList () {
+      let formData = new FormData()
+      formData.append('artist_id', this.artist) // 艺人id
+      formData.append('work_id', this.work) // 作品id
+      formData.append('works', this.WorkDetail.works) // 作品名称
+      formData.append('remarks', this.WorkDetail.remarks) // 作品备注
+      formData.append('picfile', this.workPic) // 作品封面
+      formData.append('video', this.workVideo) // 视频文件
+      this.$axios.request({
+        url: 'actionArtistWorkSaveApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        if (res.data.code === 200) {
+          alert(res.data.message)
+          // 关闭热门作品弹窗
+          this.closeCoverUpHot()
+        } else {
+          alert(res.data.message)
+        }
+      })
+    },
+    // 艺人热门作品删除操作
+    SaveWorkRemove (id, index) {
+      let formData = new FormData()
+      formData.append('work_id', id) // 热门作品id
+      this.$axios.request({
+        url: 'actionArtistWorkDelApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        if (res.data.code === 200) {
+          // 成功请求到数据后的处理
+          alert(res.data.message)
+          this.WorkDetail.splice(index, 1)
+        } else {
+          // 请求失败后的处理
+          alert(res.data.message)
+        }
+      })
+    },
+    // 艺人出席活动添加修改操作
+    SaveEventList () {
+      let formData = new FormData()
+      formData.append('artist_id', this.artist) // 艺人id
+      formData.append('event_id', this.event) // 出席活动id
+      formData.append('title', this.EventDetail.title) // 活动标题
+      formData.append('jump_link', this.EventDetail.jump_link) // 活动链接
+      formData.append('remarks', this.EventDetail.remarks) // 活动备注
+      formData.append('picfile', this.eventPic) // 活动封面
+      this.$axios.request({
+        url: 'actionArtistWorkSaveApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        if (res.data.code === 200) {
+          alert(res.data.message)
+          // 关闭出席活动弹窗
+          this.closeCoverUpHotPicter()
+        } else {
+          alert(res.data.message)
+        }
+      })
+    },
+    // 艺人热门作品删除操作
+    SaveEventRemove (id, index) {
+      let formData = new FormData()
+      formData.append('event_id', id) // 参加活动id
+      this.$axios.request({
+        url: 'actionArtistEventDelApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        if (res.data.code === 200) {
+          // 成功请求到数据后的处理
+          alert(res.data.message)
+          this.EventDetail.splice(index, 1)
+        } else {
+          // 请求失败后的处理
+          alert(res.data.message)
+        }
+      })
     }
   }
-};
+}
 </script>
 
 <style>
+  .el-card {
+    min-height: calc(50vh - 60px);
+  }
+  .cover-all {
+    width: 97px;
+    height: 146px;
+    border-radius: 2px;
+    -o-object-fit: cover;
+    object-fit: cover;
+    position: absolute;
+    margin-left: 191px;
+    margin-top: 20px;
+  }
 .hots-work {
   background: #fff;
   border-radius: 2px;
