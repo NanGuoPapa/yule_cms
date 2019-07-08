@@ -231,7 +231,6 @@
         <div class="content-news">
           <span class="must"></span>
           <span class="news">备注说明 :</span>
-          <!-- <input class="entering" type="text" placeholder="请输入赛事名称"> -->
           <textarea class="entering" cols="330" rows="81" placeholder="请输入备注信息"></textarea>
         </div>
         <div class="content-top">
