@@ -172,7 +172,9 @@
           <p class="basic-name">艺人写真</p>
         </div>
       </div>
-      <img class="cover-all" :src="coverFilePortrait" @click="choiceCover" alt>
+      <div v-for="(item, index) in coverFilePortrait" :key="index">
+          <img class="cover-all" :src="item" @click="choiceCover" alt>
+      </div>
       <div class="add-back" :show-file-list="false">
         <input
           class="cover"
@@ -267,7 +269,8 @@ export default {
       coverFileReader: '',
       backfile: '',
       coverFileArtist: '',
-      coverFilePortrait: '',
+      portrait: '',
+      coverFilePortrait: [],
       isPerformerShow: false
     }
   },
@@ -355,31 +358,19 @@ export default {
       }
     },
     onCoverPortrait (e) {
-      console.log(e.target.files)
-      // let _file = e.target.files[0]
-      // // 判断文件大小是否超出限制
-      // if (_file.size > 1024 * 1024) {
-      //   this.$refs.videoElem.value = ''
-      //   this.toast = this.$createToast({
-      //     time: 2000,
-      //     txt: '文件大小超过1M',
-      //     type: 'txt'
-      //   })
-      //   this.toast.show()
-      //   return false
-      // } else {
-      //   this.cover = _file
-      //   let _this = this
-      //   if (!e || !window.FileReader) {
-      //     return
-      //   }
-      // 看支持不支持FileReader
-      //   let reader = new FileReader()
-      //   reader.readAsDataURL(_file)
-      //   reader.onloadend = function () {
-      //     _this.coverFilePortrait = this.result
-      //   }
-      // }
+      let _file = e.target.files
+      this.portrait = _file
+      let _this = this
+      if (!e || !window.FileReader) {
+        return
+      }// 看支持不支持FileReader\
+      for (let i = 0; i < _file.length; i++) {
+        let reader = new FileReader()
+        reader.readAsDataURL(_file[i])
+        reader.onloadend = function () {
+          _this.coverFilePortrait.push(this.result)
+        }
+      }
     },
     choiceCover () {
       console.log('点击了上传视频')
@@ -407,6 +398,7 @@ export default {
       formData.append('video_type', this.artistInfo.video_type) // 视频类型
       formData.append('picfile', this.picfile) // 艺人首页展示图片
       formData.append('backfile', this.backfile) // 艺人封面图片
+      formData.append('photo', this.portrait) // 艺人写真（图片数据）
       formData.append('jphoto', this.artistInfo.photo) // 艺人写真（修改信息时必传的原json数据）
       formData.append('platform', JSON.stringify(this.platforms)) // 平台信息
       formData.append('award_experience', JSON.stringify(this.experiences)) // 艺人获奖经历

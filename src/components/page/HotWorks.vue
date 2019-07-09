@@ -107,7 +107,7 @@
             <img class="coverhots" :src="coverFileHot" @click="choiceCover" alt>
           </div>
           <div class="cover-picters">
-            <img class="coverhot" :src="coverFileHots" @click="choiceCover" alt>
+              <video class="coverhot" :src="coverFileHots" @click="choiceCover" alt></video>
           </div>
           <div class="footer">
             <span class="abolish" @click="closeCoverUpHot">取消</span>
@@ -199,7 +199,6 @@ export default {
     }).then((res) => {
       // 处理请求结果
       this.WorkList = res.data.data // 基本数据
-      console.log(this.WorkList)
     })
     // 出席活动列表
     this.$axios.request({
@@ -209,7 +208,6 @@ export default {
     }).then((res) => {
       // 处理请求结果
       this.EventList = res.data.data // 基本数据
-      console.log(this.EventList)
     })
   },
   methods: {
@@ -230,7 +228,7 @@ export default {
     WorkDetails () {
       let formData = new FormData()
       formData.append('work_id', this.work) // 艺人id
-      if (this.work) {
+      if (this.work > 0) {
         this.$axios.request({
           url: 'actionArtistWorkDetailsApi',
           method: 'POST',
@@ -258,10 +256,10 @@ export default {
       this.isPerformerShowHotPicter = false
     },
     // 出席活动详情
-    EventDetails (id) {
+    EventDetails () {
       let formData = new FormData()
       formData.append('event_id', this.event) // 艺人id
-      if (this.event) {
+      if (this.event > 0) {
         this.$axios.request({
           url: 'actionArtistEventDetailsApi',
           method: 'POST',
@@ -304,11 +302,11 @@ export default {
     onCoverHots (e) {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
-      if (_file.size > 1024 * 1024) {
+      if (_file.size > 1024 * 1024 * 40) {
         this.$refs.videoElem.value = ''
         this.toast = this.$createToast({
           time: 2000,
-          txt: '文件大小超过1M',
+          txt: '文件大小超过40M',
           type: 'txt'
         })
         this.toast.show()
