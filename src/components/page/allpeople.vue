@@ -23,7 +23,7 @@
               <th>操作</th>
             </tr>
             </thead>
-            <tbody class="contents" v-for="(item,index) in people">
+            <tbody class="contents" v-for="(item,index) in people" :key="index">
             <tr>
               <td>{{(peoplePage.pageCurrent - 1) * peoplePage.pageSize + 1 + index}}</td>
               <td>{{item.artist_name}}</td>

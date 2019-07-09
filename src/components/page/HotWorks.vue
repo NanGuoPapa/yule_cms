@@ -28,7 +28,7 @@
               <div @click="artistCoverHot" class="upload">+ 添加</div>
             </el-button>
           </li>
-          <li v-for="item in WorkList">
+          <li v-for="(item, index) in WorkList" :key="index">
             <div class="details-news" @click="artistCoverHot(item.id)">
               <div class="img">
                 <img :src="item.works_cover" alt style="width: 100%;height: 100%;">
@@ -53,7 +53,7 @@
               <div @click="artistCoverHotPicter" class="upload" style="text-align:center;width: 135px;height: 101px;">+ 添加</div>
             </el-button>
           </li>
-          <li v-for="item in EventList">
+          <li v-for="(item, index) in EventList" :key="index">
             <div class="details-news" style="width: 135px;height: 101px;" @click="artistCoverHotPicter(item.id)">
               <div class="img">
                 <img :src="item.event_cover" alt style="width: 135px;height: 101px;">
