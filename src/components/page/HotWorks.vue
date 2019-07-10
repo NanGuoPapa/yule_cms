@@ -28,11 +28,15 @@
               <div @click="artistCoverHot" class="upload">+ 添加</div>
             </el-button>
           </li>
-          <li v-for="(item, index) in WorkList" :key="index">
-            <div class="details-news" @click="artistCoverHot(item.id)">
-              <div class="img">
-                <img :src="item.works_cover" alt style="width: 100%;height: 100%;">
+          <li v-for="(item, index) in WorkList" :key="index" @mouseenter="onMouseover(index)" @mouseleave="onMouseout">
+            <div class="details-news">
+              <div class="img" style="position:relative">
+                  <img class="work_img" :src="item.works_cover">
               </div>
+                <div class="operation" v-show="seen && index === current">
+                    <div class="modify" @click="artistCoverHot(item.id)">修改</div>
+                    <div class="delete" @click="SaveWorkRemove(item.id, index)">删除</div>
+                </div>
             </div>
           </li>
         </ul>
@@ -184,7 +188,9 @@ export default {
       coverFileHot: '', // 封面（预览）
       workPic: '', // 作品封面图文件
       coverFileHots: '', // 视频（预览）
-      workVideo: '' // 视频文件
+      workVideo: '', // 作品视频文件
+      seen: false, // 控制显示和隐藏
+      current: 0
     }
   },
   mounted () {
@@ -222,6 +228,9 @@ export default {
     // 关闭上传封面弹窗
     closeCoverUpHot () {
       this.work = 0
+      this.WorkDetail = []
+      this.coverFileHot = ''
+      this.coverFileHots = ''
       this.isPerformerShowHot = false
     },
     // 热门作品详情
@@ -253,6 +262,8 @@ export default {
     // 关闭上传封面弹窗
     closeCoverUpHotPicter () {
       this.event = 0
+      this.EventDetail = []
+      this.coverFilePortrait = ''
       this.isPerformerShowHotPicter = false
     },
     // 出席活动详情
@@ -371,6 +382,16 @@ export default {
         // 处理请求结果
         if (res.data.code === 200) {
           alert(res.data.message)
+          // 将新添加或修改后的数据展示到页面中
+          if (this.work > 0) {
+            for (let i = 0; i < this.WorkList.length; i++) {
+              if (this.WorkList[i].id === this.work) {
+                this.WorkList[i].works_cover = this.coverFileHot
+              }
+            }
+          } else {
+            this.WorkList.push({ 'id': res.data.data, 'works_cover': this.coverFileHot })
+          }
           // 关闭热门作品弹窗
           this.closeCoverUpHot()
         } else {
@@ -408,13 +429,23 @@ export default {
       formData.append('remarks', this.EventDetail.remarks) // 活动备注
       formData.append('picfile', this.eventPic) // 活动封面
       this.$axios.request({
-        url: 'actionArtistWorkSaveApi',
+        url: 'actionArtistEventSaveApi',
         method: 'POST',
         data: formData
       }).then((res) => {
         // 处理请求结果
         if (res.data.code === 200) {
           alert(res.data.message)
+          // 将新添加或修改后的数据展示到页面中
+          if (this.event > 0) {
+            for (let i = 0; i < this.EventList.length; i++) {
+              if (this.EventList[i].id === this.event) {
+                this.EventList[i].works_cover = this.coverFilePortrait
+              }
+            }
+          } else {
+            this.EventList.push({ 'id': res.data.data, 'event_cover': this.coverFilePortrait })
+          }
           // 关闭出席活动弹窗
           this.closeCoverUpHotPicter()
         } else {
@@ -422,7 +453,7 @@ export default {
         }
       })
     },
-    // 艺人热门作品删除操作
+    // 艺人出席活动删除操作
     SaveEventRemove (id, index) {
       let formData = new FormData()
       formData.append('event_id', id) // 参加活动id
@@ -441,6 +472,16 @@ export default {
           alert(res.data.message)
         }
       })
+    },
+    // 鼠标浮动移入触发事件
+    onMouseover (index) {
+      this.seen = true
+      this.current = index
+    },
+    // 鼠标浮动移出触发事件
+    onMouseout () {
+      this.seen = false
+      this.current = null
     }
   }
 }
@@ -605,4 +646,41 @@ export default {
   margin-left: 158px;
   opacity: 0;
 }
+    .work_img{
+        position:absolute;
+        width: 151px;
+        height: 187px;
+    }
+    .operation{
+        width: 151px;
+        height: 187px;
+        position:absolute;
+        z-index:1;
+        background:rgba(0,0,0,0.5);
+    }
+    .operation div{
+        width:32px;
+        height:32px;
+        background:rgba(153,153,153,1);
+        opacity:0.9;
+        border-radius:50%;
+        margin: 0 auto;
+        text-align: center;
+        line-height:30px;
+        color:rgba(255,255,255,1);
+    }
+    .modify{
+        position: absolute;
+        left: 50%;
+        top: 40%;
+        transform: translate(-50%, -50%);
+        cursor:pointer
+    }
+    .delete{
+        position: absolute;
+        left: 50%;
+        top: 60%;
+        transform: translate(-50%, -50%);
+        cursor:pointer
+    }
 </style>
