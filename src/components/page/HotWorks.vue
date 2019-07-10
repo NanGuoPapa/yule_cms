@@ -28,12 +28,12 @@
               <div @click="artistCoverHot" class="upload">+ 添加</div>
             </el-button>
           </li>
-          <li v-for="(item, index) in WorkList" :key="index" @mouseenter="onMouseover(index)" @mouseleave="onMouseout">
+          <li v-for="(item, index) in WorkList" :key="index" @mouseenter="onMouseover(index,1)" @mouseleave="onMouseout">
             <div class="details-news">
               <div class="img" style="position:relative">
                   <img class="work_img" :src="item.works_cover">
               </div>
-                <div class="operation" v-show="seen && index === current">
+                <div class="operation" v-show="seenWork && index === current">
                     <div class="modify" @click="artistCoverHot(item.id)">修改</div>
                     <div class="delete" @click="SaveWorkRemove(item.id, index)">删除</div>
                 </div>
@@ -57,11 +57,15 @@
               <div @click="artistCoverHotPicter" class="upload" style="text-align:center;width: 135px;height: 101px;">+ 添加</div>
             </el-button>
           </li>
-          <li v-for="(item, index) in EventList" :key="index">
-            <div class="details-news" style="width: 135px;height: 101px;" @click="artistCoverHotPicter(item.id)">
-              <div class="img">
-                <img :src="item.event_cover" alt style="width: 135px;height: 101px;">
+          <li v-for="(item, index) in EventList" :key="index" @mouseenter="onMouseover(index,2)" @mouseleave="onMouseout">
+            <div class="details-news" style="width: 135px;height: 101px;">
+              <div class="img" style="position:relative">
+                <img class="event_img" :src="item.event_cover">
               </div>
+                <div class="eoperation" v-show="seenEvent && index === current">
+                    <div class="emodify" @click="artistCoverHotPicter(item.id)">修改</div>
+                    <div class="edelete" @click="SaveEventRemove(item.id, index)">删除</div>
+                </div>
             </div>
           </li>
         </ul>
@@ -69,7 +73,8 @@
     </el-card>
     <!-- 保存 -->
     <div class="keep">
-      <span class="keep-works">保存</span>
+        <span class="keep-works" v-if="EventList && WorkList" @click="JumpList">完成</span>
+        <span class="keep-works" v-else @click="JumpList">跳过</span>
     </div>
     <div class="explains">
       <p class="tiansins">copyright 2019 北京天率科技有限公司出品</p>
@@ -189,8 +194,9 @@ export default {
       workPic: '', // 作品封面图文件
       coverFileHots: '', // 视频（预览）
       workVideo: '', // 作品视频文件
-      seen: false, // 控制显示和隐藏
-      current: 0
+      seenWork: false,
+      seenEvent: false,
+      current: 0 // 控制显示和隐藏
     }
   },
   mounted () {
@@ -381,7 +387,6 @@ export default {
       }).then((res) => {
         // 处理请求结果
         if (res.data.code === 200) {
-          alert(res.data.message)
           // 将新添加或修改后的数据展示到页面中
           if (this.work > 0) {
             for (let i = 0; i < this.WorkList.length; i++) {
@@ -394,6 +399,8 @@ export default {
           }
           // 关闭热门作品弹窗
           this.closeCoverUpHot()
+          // 提示
+          alert(res.data.message)
         } else {
           alert(res.data.message)
         }
@@ -410,9 +417,9 @@ export default {
       }).then((res) => {
         // 处理请求结果
         if (res.data.code === 200) {
+          this.WorkList.splice(index, 1)
           // 成功请求到数据后的处理
           alert(res.data.message)
-          this.WorkDetail.splice(index, 1)
         } else {
           // 请求失败后的处理
           alert(res.data.message)
@@ -435,7 +442,6 @@ export default {
       }).then((res) => {
         // 处理请求结果
         if (res.data.code === 200) {
-          alert(res.data.message)
           // 将新添加或修改后的数据展示到页面中
           if (this.event > 0) {
             for (let i = 0; i < this.EventList.length; i++) {
@@ -448,6 +454,8 @@ export default {
           }
           // 关闭出席活动弹窗
           this.closeCoverUpHotPicter()
+          // 提示
+          alert(res.data.message)
         } else {
           alert(res.data.message)
         }
@@ -464,9 +472,9 @@ export default {
       }).then((res) => {
         // 处理请求结果
         if (res.data.code === 200) {
+          this.EventList.splice(index, 1)
           // 成功请求到数据后的处理
           alert(res.data.message)
-          this.EventDetail.splice(index, 1)
         } else {
           // 请求失败后的处理
           alert(res.data.message)
@@ -474,14 +482,23 @@ export default {
       })
     },
     // 鼠标浮动移入触发事件
-    onMouseover (index) {
-      this.seen = true
+    onMouseover (index, type) {
+      if (type === 1) {
+        this.seenWork = true
+      } else if (type === 2) {
+        this.seenEvent = true
+      }
       this.current = index
     },
     // 鼠标浮动移出触发事件
     onMouseout () {
-      this.seen = false
+      this.seenWork = false
+      this.seenEvent = false
       this.current = null
+    },
+    // 返回列表页
+    JumpList () {
+      this.$router.push({ path: '/allpeople' })
     }
   }
 }
@@ -683,4 +700,41 @@ export default {
         transform: translate(-50%, -50%);
         cursor:pointer
     }
+  .event_img{
+      position:absolute;
+      width: 135px;
+      height: 101px;
+  }
+  .eoperation{
+      width: 135px;
+      height: 101px;
+      position:absolute;
+      z-index:1;
+      background:rgba(0,0,0,0.5);
+  }
+  .eoperation div{
+      width:32px;
+      height:32px;
+      background:rgba(153,153,153,1);
+      opacity:0.9;
+      border-radius:50%;
+      margin: 0 auto;
+      text-align: center;
+      line-height:30px;
+      color:rgba(255,255,255,1);
+  }
+  .emodify{
+      position: absolute;
+      left: 35%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      cursor:pointer
+  }
+  .edelete{
+      position: absolute;
+      left: 65%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      cursor:pointer
+  }
 </style>
