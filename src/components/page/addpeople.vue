@@ -19,6 +19,7 @@
       <div class="information-title">
         <span class="must-fill">*</span>
         <p class="information-news">基本信息</p>
+          <span class="wrong">{{basicText}}</span>
       </div>
       <div class="basic">
         <div class="basic-big">
@@ -82,6 +83,7 @@
       <div class="information-title">
         <span class="must-fill">*</span>
         <p class="information-news">联系方式</p>
+          <span class="wrong">{{contactText}}</span>
       </div>
       <div class="contact">
         <div class="basic-big">
@@ -132,6 +134,7 @@
         <div class="basic-big">
           <span class="basic-fill">*</span>
           <p class="basic-name">艺人首页展示</p>
+            <span class="wrong">{{picfileText}}</span>
         </div>
       </div>
       <div class="add-back" :show-file-list="false">
@@ -153,6 +156,7 @@
         <div class="basic-big">
           <span class="basic-fill">*</span>
           <p class="basic-name">艺人封面</p>
+            <span class="wrong">{{backfileText}}</span>
         </div>
       </div>
       <div class="add-artist"  >
@@ -172,6 +176,7 @@
         <div class="basic-big">
           <span class="basic-fill">*</span>
           <p class="basic-name">艺人写真</p>
+            <span class="wrong">{{portraitText}}</span>
         </div>
       </div>
       <div  class="add-backs" :show-file-list="false">
@@ -340,7 +345,7 @@
         <div class="content-top">
           <span class="must">*</span>
           <span class="news">图片上传 :</span>
-          <input class="butto" type="file" @change="onCoverPortrait">
+          <input class="butto" type="file" @change="onCoverPortraitgo">
           <input class="gitup">
           <img class="gitup-img" src="../../assets/images/goup.png" alt>
           <span class="font">上传文件</span>
@@ -435,8 +440,12 @@ export default {
       coverFileHot: '', // 封面（预览）
       workPic: '', // 作品封面图文件
       coverFileHots: '', // 视频（预览）
-      workVideo: '' // 视频文件
-
+      workVideo: '', // 视频文件
+      basicText: '', // 基本信息为空的警告信息
+      contactText: '', // 联系方式信息为空的警告信息
+      picfileText: '', // 艺人首页展示警告信息
+      backfileText: '', // 艺人封面展示警告信息
+      portraitText: '' // 艺人写真展示警告信息
     }
   },
   mounted () {
@@ -525,7 +534,7 @@ export default {
       }
     },
     // 上传出席活动封面
-    onCoverPortrait (e) {
+    onCoverPortraitgo (e) {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
@@ -714,15 +723,10 @@ export default {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = ''
-        this.toast = this.$createToast({
-          time: 2000,
-          txt: '文件大小超过1M',
-          type: 'txt'
-        })
-        this.toast.show()
+        this.picfileText = '图片大小请小于1M'
         return false
       } else {
+        this.picfileText = ''
         this.picfile = _file
         let _this = this
         if (!e || !window.FileReader) {
@@ -739,15 +743,10 @@ export default {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = ''
-        this.toast = this.$createToast({
-          time: 2000,
-          txt: '文件大小超过1M',
-          type: 'txt'
-        })
-        this.toast.show()
+        this.backfileText = '图片大小请小于1M'
         return false
       } else {
+        this.backfileText = ''
         this.backfile = _file
         let _this = this
         if (!e || !window.FileReader) {
@@ -768,16 +767,18 @@ export default {
         return
       }// 看支持不支持FileReader\
       for (let i = 0; i < _file.length; i++) {
+        if (_file[i].size > 1024 * 1024) {
+          this.portraitText = '每张图片大小请小于1M'
+          return false
+        } else {
+          this.portraitText = ''
+        }
         let reader = new FileReader()
         reader.readAsDataURL(_file[i])
         reader.onloadend = function () {
           _this.coverFilePortrait.push(this.result)
         }
       }
-    },
-    choiceCover () {
-      console.log('点击了上传视频')
-      this.$refs.choiceCoverElem.dispatchEvent(new MouseEvent('click'))
     },
     choiceCovers () {
       console.log('点击了上传视频')
@@ -787,6 +788,57 @@ export default {
       console.log(123)
     },
     artistAdd () {
+      // 基本信息验证是否为空
+      if (!this.artistInfo.artist_name) {
+        this.basicText = '请输入艺人姓名'
+        return false
+      } else {
+        this.basicText = ''
+      }
+      if (!this.artistInfo.artist_type) {
+        this.basicText = '请输入艺人类型'
+        return false
+      } else {
+        this.basicText = ''
+      }
+      if (!this.artistInfo.artist_introduction) {
+        this.basicText = '请输入艺人简介'
+        return false
+      } else {
+        this.basicText = ''
+      }
+      // 联系方式验证是否为空
+      if (!this.artistInfo.weibo_name) {
+        this.contactText = '请输入微博姓名'
+        return false
+      } else {
+        this.contactText = ''
+      }
+      if (!this.artistInfo.weibo_link) {
+        this.contactText = '请输入微博链接'
+        return false
+      } else {
+        this.contactText = ''
+      }
+      // 文件信息验证
+      if (!this.artistInfo.picfile) {
+        this.picfileText = '请上传艺人首页展示图'
+        return false
+      } else {
+        this.picfileText = ''
+      }
+      if (!this.artistInfo.backfile) {
+        this.backfileText = '请上传艺人封面图'
+        return false
+      } else {
+        this.backfileText = ''
+      }
+      if (!this.artistInfo.portrait) {
+        this.portraitText = '请上传艺人写真图'
+        return false
+      } else {
+        this.portraitText = ''
+      }
       let formData = new FormData()
       formData.append('artist_id', this.artist) // 艺人id
       formData.append('artist_name', this.artistInfo.artist_name) // 艺人姓名
@@ -1110,5 +1162,11 @@ export default {
         margin-left: 900px;
         left: 100px;
         cursor: pointer;
+    }
+    .wrong{
+        margin-left: 20px;
+        font-size:7px;
+        font-weight:400;
+        color:rgba(255,85,85,1)
     }
 </style>
