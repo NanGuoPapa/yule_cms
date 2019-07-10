@@ -136,6 +136,8 @@
       </div>
       <div class="add-back" :show-file-list="false">
         <img class="cover-works" :src="coverFileReader" @click="choiceCover" alt>
+        <div class="replace1">
+        </div>
         <input
           class="cover"
           type="file"
@@ -172,10 +174,7 @@
           <p class="basic-name">艺人写真</p>
         </div>
       </div>
-      <div v-for="(item, index) in coverFilePortrait" :key="index">
-          <img class="cover-all" :src="item" @click="choiceCover" alt>
-      </div>
-      <div class="add-back" :show-file-list="false">
+      <div  class="add-backs" :show-file-list="false">
         <input
           class="cover"
           type="file"
@@ -186,6 +185,15 @@
         >
         <span class="add-picter">+</span>
         <span class="add-picter">添加</span>
+      </div>
+      <div class="all_picter">
+        <ul class="picter_ul">
+          <li style="display: inline-block;" class="more_picter" v-for="(item, index) in coverFilePortrait" :key="index">
+            <div >
+              <img class="cover-all" :src="item" @click="choiceCover" alt>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
     <!-- 获奖经历结束 -->
@@ -207,6 +215,149 @@
         </div>
       </div>
     </div>
+    <!-- 热门作品 -->
+   <!-- <el-card style="margin:15px;">
+      <div class="basic">
+        <div class="basic-big">
+          <span class="basic-fill"></span>
+          <p class="basic-name">热门作品 (选填)</p>
+        </div>
+      </div>
+      <div class="details" name="myComponent">
+        <ul>
+          <li>
+            <el-button type="text">
+              <div @click="artistCoverHot" class="upload">+ 添加</div>
+            </el-button>
+          </li>
+          <li v-for="(item, index) in WorkList" :key="index">
+            <div class="details-news" @click="artistCoverHot(item.id)">
+              <div class="img">
+                <img :src="item.works_cover" alt style="width: 100%;height: 100%;">
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </el-card>-->
+    <!-- 出席活动 -->
+   <!-- <el-card style="margin:15px;">
+      <div class="basic">
+        <div class="basic-big">
+          <span class="basic-fill"></span>
+          <p class="basic-name">出席活动 (选填)</p>
+        </div>
+      </div>
+      <div class="details" name="myComponent">
+        <ul>
+          <li>
+            <el-button type="text">
+              <div @click="artistCoverHotPicter" class="upload" style="text-align:center;width: 135px;height: 101px;">+ 添加</div>
+            </el-button>
+          </li>
+          <li v-for="(item, index) in EventList" :key="index">
+            <div class="details-news" style="width: 135px;height: 101px;" @click="artistCoverHotPicter(item.id)">
+              <div class="img">
+                <img :src="item.event_cover" alt style="width: 135px;height: 101px;">
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </el-card>-->
+    <!-- 添加热门作品封面弹窗 -->
+<!--    <div v-show="isPerformerShowHot">
+      <div class="elastic" style="z-index: 2011;">
+        <div class="border-bott">
+          <span class="addmatch">添加热门作品</span>
+          <span @click="closeCoverUpHot" class="icon">×</span>
+        </div>
+        <div class="content-news">
+          <span class="must">*</span>
+          <span class="news">作品名称 :</span>
+          <input class="butto" type="text" placeholder="请输入作品名称" v-model="WorkDetail.works">
+        </div>
+        <div class="content-news">
+          <span class="must"></span>
+          <span class="news">备注说明 :</span>
+          <textarea class="entering" cols="330" rows="81" placeholder="请输入备注信息" v-model="WorkDetail.remarks"></textarea>
+        </div>
+        <div class="content-top">
+          <span class="must">*</span>
+          <span class="news">上传文件 :</span>
+          <input class="butto" type="file" @change="onCoverHot">
+
+          <input class="gitup">
+          <img class="gitup-img" src="../../assets/images/goup.png" alt>
+          <span class="font">上传封面</span>
+          <input class="buttos" type="file" @change="onCoverHots">
+          <input class="gitups">
+          <img class="gitup-imgs" src="../../assets/images/goup.png" alt>
+          <span class="fonts">上传视频</span>
+          <p class="Jurisdiction">支持扩展名：.doc .docx .pdf .jpg...</p>
+          <p class="Jurisdictions">支持扩展名：.doc .docx .pdf .jpg...</p>
+          <span class="cover-small">尺寸：400*600px</span>
+          <span class="video-small">尺寸：400*600px</span>
+          <div class="cover-picter">
+            <img class="coverhots" :src="coverFileHot" @click="choiceCover" alt>
+          </div>
+          <div class="cover-picters">
+            <video class="coverhot" :src="coverFileHots" @click="choiceCover" alt></video>
+          </div>
+          <div class="footer">
+            <span class="abolish" @click="closeCoverUpHot">取消</span>
+            <span class="determine" @click="SaveWorkList">确定</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal" style="z-index: 2010;"></div>
+    </div>-->
+    <!-- 结束 -->
+    <!-- 添加出席活动弹窗 -->
+ <!--   <div v-show="isPerformerShowHotPicter">
+      <div class="elastic" style="z-index: 2011;">
+        <div class="border-bott">
+          <span class="addmatch">添加出席活动</span>
+          <span @click="closeCoverUpHotPicter" class="icon">×</span>
+        </div>
+        <div class="content-news">
+          <span class="must">*</span>
+          <span class="news">活动标题 :</span>
+          <input class="butto" type="text" placeholder="请输入活动标题" v-model="EventDetail.title">
+        </div>
+        <div class="content-news">
+          <span class="must">*</span>
+          <span class="news">跳转链接 :</span>
+          <input class="butto" type="text" placeholder="请输入跳转链接" v-model="EventDetail.jump_link">
+        </div>
+        <div class="content-news">
+          <span class="must"></span>
+          <span class="news">备注说明 :</span>
+          &lt;!&ndash; <input class="entering" type="text" placeholder="请输入赛事名称"> &ndash;&gt;
+          <textarea class="entering" cols="330" rows="81" placeholder="请输入备注信息" v-model="EventDetail.remarks"></textarea>
+        </div>
+        <div class="content-top">
+          <span class="must">*</span>
+          <span class="news">图片上传 :</span>
+          <input class="butto" type="file" @change="onCoverPortrait">
+          <input class="gitup">
+          <img class="gitup-img" src="../../assets/images/goup.png" alt>
+          <span class="font">上传文件</span>
+          <p class="Jurisdiction">支持扩展名：.doc .docx .pdf .jpg...</p>
+          <div class="content-pict">
+            <img class="pict" :src="coverFilePortrait" @click="choiceCover" alt>
+          </div>
+          <div class="footer">
+            <span class="abolish" @click="closeCoverUpHotPicter">取消</span>
+            <span class="determine" @click="SaveEventList">确定</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal" style="z-index: 2010;"></div>
+    </div>-->
+    <!-- 结束 -->
     <!-- 底部 -->
     <!--<router-link to="/HotWorks" v-if="true">-->
       <div class="footers">
@@ -272,6 +423,7 @@ export default {
       portrait: '',
       coverFilePortrait: [],
       isPerformerShow: false
+
     }
   },
   mounted () {
@@ -426,8 +578,31 @@ export default {
 </script>
 
 <style>
-.inp {
-  height: 10px;
+
+
+  .add-backs {
+    width: 97px;
+    height: 146px;
+    border: 1px solid rgba(224, 224, 224, 1);
+    border-radius: 2px;
+    margin-top: 14px;
+    margin-left: 52px;
+    text-align: center;
+  }
+
+.picter_ul {
+  width: 77%;
+  margin: auto;
+  margin-top: -190px;
+  position: relative;
+}
+.all_picter {
+  display: -webkit-box;
+
+}
+.more_picter {
+  width: 1px;
+  margin-left: 114px;
 }
 .introduce {
   height: 94px;
@@ -536,7 +711,7 @@ export default {
   text-align: center;
   object-fit: cover;
   position: absolute;
-  margin-left: -35.5px;
+  margin-left: -48.5px;
 }
 .add-back {
   width: 97px;
@@ -595,9 +770,9 @@ export default {
   border-radius: 2px;
   text-align: center;
   object-fit: cover;
-  position: absolute;
-  margin-left: -66px;
-  margin-top: 58px;
+  position: relative!important;
+  margin-left: -99px!important;
+  margin-top: 43px!important;
 }
 .award {
   background: #fff;
