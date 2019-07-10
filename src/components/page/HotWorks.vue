@@ -25,7 +25,7 @@
         <ul>
           <li>
             <el-button type="text">
-              <div @click="artistCoverHot" class="upload">+ 添加</div>
+              <div style="border: 1px solid rgb(224, 224, 224);" @click="artistCoverHot" class="upload">+ 添加</div>
             </el-button>
           </li>
           <li v-for="(item, index) in WorkList" :key="index">
@@ -50,7 +50,7 @@
         <ul>
           <li>
             <el-button type="text">
-              <div @click="artistCoverHotPicter" class="upload" style="text-align:center;width: 135px;height: 101px;">+ 添加</div>
+              <div @click="artistCoverHotPicter" class="upload" style="text-align:center;width: 135px;height: 101px; border: 1px solid rgb(224, 224, 224); line-height: 101px;">+ 添加</div>
             </el-button>
           </li>
           <li v-for="(item, index) in EventList" :key="index">
