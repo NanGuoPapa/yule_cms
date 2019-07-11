@@ -373,8 +373,8 @@
     <!-- 底部 -->
     <!--<router-link to="/HotWorks" v-if="true">-->
       <div class="footers">
-          <div class="footer-preserve" @click="artistAdd" v-if="artist === 0">保存并下一步</div>
-          <div class="footer-preserve" @click="artistAdd" v-else>完成</div>
+        <div class="footer-preserve" @click="artistAdd" v-if="artist > 0">完成</div>
+        <div class="footer-preserve" @click="artistAdd" v-else>保存并下一步</div>
       </div>
     <!--</router-link>-->
     <div class="explain">
@@ -929,12 +929,18 @@ export default {
         // 处理请求结果
         if (res.data.code === 200) {
           alert(res.data.message)
-          this.$router.push({ path: '/HotWorks',
-            name: 'HotWorks',
-            query: {
-              artist: res.data.data.artist_id
-            }
-          })
+          if (this.artist > 0) {
+            // 修改操作跳转至列表页
+            this.$router.push({ path: '/allpeople' })
+          } else {
+            // 添加操作跳转至艺人作品和艺人活动页
+            this.$router.push({ path: '/HotWorks',
+              name: 'HotWorks',
+              query: {
+                artist: res.data.data.artist_id
+              }
+            })
+          }
         } else {
           alert(res.data.message)
         }
