@@ -99,19 +99,19 @@
           <input class="basic-input" type="text" placeholder="请输入微博链接" v-model="artistInfo.weibo_link">
         </div>
       </div>
-        <div v-for="(item, index) in platforms" :key="index">
+        <div v-for="(items, index) in platforms" :key="index">
       <div class="contact">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">平台名称</p>
-          <input class="basic-input" type="text" placeholder="请输入平台名称" v-model="platforms[index].name">
+          <input class="basic-input" type="text" placeholder="请输入平台名称" v-model="items.name">
         </div>
       </div>
       <div class="contact">
         <div class="basic-big">
           <span class="basic-fill"></span>
           <p class="basic-name">平台链接</p>
-          <input class="basic-input" type="text" placeholder="请选平台链接" v-model="platforms[index].link">
+          <input class="basic-input" type="text" placeholder="请选平台链接" v-model="items.link">
         </div>
       </div>
             <div class="add-input" @click="platform">
@@ -193,7 +193,7 @@
       </div>
       <div class="all_picter">
         <ul class="picter_ul">
-          <li style="display: inline-block;" class="more_picter" v-for="(item, index) in coverFilePortrait" :key="index">
+          <li style="display: inline-block;" class="more_picter" v-for="(item, index) in coverFilePortraits" :key="index">
             <div >
               <img class="cover-all" :src="item" @click="choiceCover" alt>
             </div>
@@ -221,54 +221,62 @@
       </div>
     </div>
     <!-- 热门作品 -->
-    <el-card style="margin:15px;">
-      <div class="basic">
-        <div class="basic-big">
-          <span class="basic-fill"></span>
-          <p class="basic-name">热门作品 (选填)</p>
-        </div>
-      </div>
-      <div class="details" name="myComponent">
-        <ul>
-          <li>
-            <el-button type="text">
-              <div style="border: 1px solid rgba(224, 224, 224, 1);" @click="artistCoverHot" class="upload">+ 添加</div>
-            </el-button>
-          </li>
-          <li v-for="(item, index) in WorkList" :key="index">
-            <div class="details-news" @click="artistCoverHot(item.id)">
-              <div class="img">
-                <img :src="item.works_cover" alt style="width: 100%;height: 100%;">
-              </div>
+    <el-card style="margin:15px;" v-if="artist > 0">
+        <div class="basic">
+            <div class="basic-big">
+                <span class="basic-fill"></span>
+                <p class="basic-name">热门作品</p>
             </div>
-          </li>
-        </ul>
-      </div>
+        </div>
+        <div class="details" name="myComponent">
+            <ul>
+                <li>
+                    <el-button type="text">
+                        <div style="border: 1px solid rgb(224, 224, 224);" @click="artistCoverHot" class="upload">+ 添加</div>
+                    </el-button>
+                </li>
+                <li v-for="(item, index) in WorkList" :key="index" @mouseenter="onMouseover(index,1)" @mouseleave="onMouseout">
+                    <div class="details-news">
+                        <div class="img" style="position:relative">
+                            <img class="work_img" :src="item.works_cover">
+                        </div>
+                        <div class="operation" v-show="seenWork && index === current">
+                            <div class="modify" @click="artistCoverHot(item.id)">修改</div>
+                            <div class="delete" @click="SaveWorkRemove(item.id, index)">删除</div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </el-card>
     <!-- 出席活动 -->
-    <el-card style="margin:15px;">
-      <div class="basic">
-        <div class="basic-big">
-          <span class="basic-fill"></span>
-          <p class="basic-name">出席活动 (选填)</p>
-        </div>
-      </div>
-      <div class="details" name="myComponent">
-        <ul>
-          <li>
-            <el-button type="text">
-              <div  @click="artistCoverHotPicter" class="upload" style="text-align:center;width: 135px;height: 101px; border: 1px solid rgb(224, 224, 224); line-height: 101px;">+ 添加</div>
-            </el-button>
-          </li>
-          <li v-for="(item, index) in EventList" :key="index">
-            <div class="details-news" style="width: 135px;height: 101px;" @click="artistCoverHotPicter(item.id)">
-              <div class="img">
-                <img :src="item.event_cover" alt style="width: 135px;height: 101px;">
-              </div>
+    <el-card style="margin:15px;" v-if="artist > 0">
+        <div class="basic">
+            <div class="basic-big">
+                <span class="basic-fill"></span>
+                <p class="basic-name">出席活动 (选填)</p>
             </div>
-          </li>
-        </ul>
-      </div>
+        </div>
+        <div class="details" name="myComponent">
+            <ul>
+                <li>
+                    <el-button type="text">
+                        <div @click="artistCoverHotPicter" class="upload" style="text-align:center;width: 135px;height: 101px; border: 1px solid rgb(224, 224, 224); line-height: 101px;">+ 添加</div>
+                    </el-button>
+                </li>
+                <li v-for="(item, index) in EventList" :key="index" @mouseenter="onMouseover(index,2)" @mouseleave="onMouseout">
+                    <div class="details-news" style="width: 135px;height: 101px;">
+                        <div class="img" style="position:relative">
+                            <img class="event_img" :src="item.event_cover">
+                        </div>
+                        <div class="eoperation" v-show="seenEvent && index === current">
+                            <div class="emodify" @click="artistCoverHotPicter(item.id)">修改</div>
+                            <div class="edelete" @click="SaveEventRemove(item.id, index)">删除</div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
     </el-card>
     <!-- 添加热门作品封面弹窗 -->
     <div v-show="isPerformerShowHot">
@@ -339,7 +347,6 @@
         <div class="content-news">
           <span class="must"></span>
           <span class="news">备注说明 :</span>
-          <!-- <input class="entering" type="text" placeholder="请输入赛事名称"> -->
           <textarea class="entering" cols="330" rows="81" placeholder="请输入备注信息" v-model="EventDetail.remarks"></textarea>
         </div>
         <div class="content-top">
@@ -366,7 +373,8 @@
     <!-- 底部 -->
     <!--<router-link to="/HotWorks" v-if="true">-->
       <div class="footers">
-        <span class="footer-preserve" @click="artistAdd">保存并下一步</span>
+          <div class="footer-preserve" @click="artistAdd" v-if="artist === 0">保存并下一步</div>
+          <div class="footer-preserve" @click="artistAdd" v-else>完成</div>
       </div>
     <!--</router-link>-->
     <div class="explain">
@@ -421,12 +429,13 @@ export default {
       artistInfo: [],
       platforms: [{ name: '', link: '' }], // 平台
       experiences: [''], // 获奖经历
-      picfile: '',
-      coverFileReader: '',
-      backfile: '',
-      coverFileArtist: '',
-      portrait: '',
-      coverFilePortrait: [],
+      picfile: '', // 艺人首页展示
+      coverFileReader: '', // 艺人首页展示图预览
+      backfile: '', // 艺人封面
+      coverFileArtist: '', // 艺人封面预览
+      portrait: [], // 艺人写真
+      coverFilePortraits: [], // 艺人写真预览
+      coverFilePortrait: '',
       isPerformerShow: false,
       work: 0, // 热门作品id
       event: 0, // 参加活动id
@@ -441,6 +450,9 @@ export default {
       workPic: '', // 作品封面图文件
       coverFileHots: '', // 视频（预览）
       workVideo: '', // 视频文件
+      seenWork: false,
+      seenEvent: false,
+      current: 0, // 控制鼠标悬浮时的显示和隐藏
       basicText: '', // 基本信息为空的警告信息
       contactText: '', // 联系方式信息为空的警告信息
       picfileText: '', // 艺人首页展示警告信息
@@ -450,26 +462,44 @@ export default {
   },
   mounted () {
     this.artist = this.$route.query.artist
-    let formData = new FormData()
-    formData.append('artist_id', this.artist) // 艺人id
-    // 热门作品列表
-    this.$axios.request({
-      url: 'actionArtistWorkListApi',
-      method: 'POST',
-      data: formData
-    }).then((res) => {
-      // 处理请求结果
-      this.WorkList = res.data.data // 基本数据
-    })
-    // 出席活动列表
-    this.$axios.request({
-      url: 'actionArtistEventListApi',
-      method: 'POST',
-      data: formData
-    }).then((res) => {
-      // 处理请求结果
-      this.EventList = res.data.data // 基本数据
-    })
+    if (this.artist > 0) {
+      let formData = new FormData()
+      formData.append('artist_id', this.artist) // 艺人id
+      // 艺人基本信息
+      this.$axios.request({
+        url: 'actionArtistDetailsApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        this.artistInfo = res.data.data // 基本数据
+        this.platforms = JSON.parse(res.data.data.platform) // 平台信息
+        this.experiences = JSON.parse(res.data.data.award_experience) // 平台信息
+        this.coverFileReader = res.data.data.artist_cover// 艺人首页展示图预览
+        this.coverFileArtist = res.data.data.artist_back// 艺人封面图图预览
+        if (res.data.data.artist_photo) {
+          this.coverFilePortraits = JSON.parse(res.data.data.artist_photo) // 艺人写真预览
+        }
+      })
+      // 热门作品列表
+      this.$axios.request({
+        url: 'actionArtistWorkListApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        this.WorkList = res.data.data // 基本数据
+      })
+      // 出席活动列表
+      this.$axios.request({
+        url: 'actionArtistEventListApi',
+        method: 'POST',
+        data: formData
+      }).then((res) => {
+        // 处理请求结果
+        this.EventList = res.data.data // 基本数据
+      })
+    }
   },
   methods: {
     // 点击显示弹窗
@@ -483,6 +513,9 @@ export default {
     // 关闭上传封面弹窗
     closeCoverUpHot () {
       this.work = 0
+      this.WorkDetail = []
+      this.coverFileHot = ''
+      this.coverFileHots = ''
       this.isPerformerShowHot = false
     },
     // 热门作品详情
@@ -514,6 +547,8 @@ export default {
     // 关闭上传封面弹窗
     closeCoverUpHotPicter () {
       this.event = 0
+      this.EventDetail = []
+      this.coverFilePortrait = ''
       this.isPerformerShowHotPicter = false
     },
     // 出席活动详情
@@ -632,6 +667,16 @@ export default {
         // 处理请求结果
         if (res.data.code === 200) {
           alert(res.data.message)
+          // 将新添加或修改后的数据展示到页面中
+          if (this.work > 0) {
+            for (let i = 0; i < this.WorkList.length; i++) {
+              if (this.WorkList[i].id === this.work) {
+                this.WorkList[i].works_cover = this.coverFileHot
+              }
+            }
+          } else {
+            this.WorkList.push({ 'id': res.data.data, 'works_cover': this.coverFileHot })
+          }
           // 关闭热门作品弹窗
           this.closeCoverUpHot()
         } else {
@@ -676,6 +721,16 @@ export default {
         // 处理请求结果
         if (res.data.code === 200) {
           alert(res.data.message)
+          // 将新添加或修改后的数据展示到页面中
+          if (this.event > 0) {
+            for (let i = 0; i < this.EventList.length; i++) {
+              if (this.EventList[i].id === this.event) {
+                this.EventList[i].event_cover = this.coverFilePortrait
+              }
+            }
+          } else {
+            this.EventList.push({ 'id': res.data.data, 'event_cover': this.coverFilePortrait })
+          }
           // 关闭出席活动弹窗
           this.closeCoverUpHotPicter()
         } else {
@@ -776,7 +831,7 @@ export default {
         let reader = new FileReader()
         reader.readAsDataURL(_file[i])
         reader.onloadend = function () {
-          _this.coverFilePortrait.push(this.result)
+          _this.coverFilePortraits.push(this.result)
         }
       }
     },
@@ -821,19 +876,19 @@ export default {
         this.contactText = ''
       }
       // 文件信息验证
-      if (!this.artistInfo.picfile) {
+      if (!this.artistInfo.picfile && this.artist === 0) {
         this.picfileText = '请上传艺人首页展示图'
         return false
       } else {
         this.picfileText = ''
       }
-      if (!this.artistInfo.backfile) {
+      if (!this.artistInfo.backfile && this.artist === 0) {
         this.backfileText = '请上传艺人封面图'
         return false
       } else {
         this.backfileText = ''
       }
-      if (!this.artistInfo.portrait) {
+      if (!this.artistInfo.portrait && this.artist === 0) {
         this.portraitText = '请上传艺人写真图'
         return false
       } else {
@@ -853,8 +908,17 @@ export default {
       formData.append('video_type', this.artistInfo.video_type) // 视频类型
       formData.append('picfile', this.picfile) // 艺人首页展示图片
       formData.append('backfile', this.backfile) // 艺人封面图片
-      formData.append('photo', this.portrait) // 艺人写真（图片数据）
-      formData.append('jphoto', this.artistInfo.photo) // 艺人写真（修改信息时必传的原json数据）
+      for (let i in this.portrait) { // 艺人写真（图片数据）
+        if (this.portrait[i] % 1 === 0) {
+          break
+        }
+        formData.append('photo[]', this.portrait[i])
+      }
+      if (!this.artistInfo.artist_photo) {
+        formData.append('jphoto', '') // 艺人写真（修改信息时必传的原json数据）
+      } else {
+        formData.append('jphoto', this.artistInfo.artist_photo) // 艺人写真（修改信息时必传的原json数据）
+      }
       formData.append('platform', JSON.stringify(this.platforms)) // 平台信息
       formData.append('award_experience', JSON.stringify(this.experiences)) // 艺人获奖经历
       this.$axios.request({
@@ -875,6 +939,21 @@ export default {
           alert(res.data.message)
         }
       })
+    },
+    // 鼠标浮动移入触发事件
+    onMouseover (index, type) {
+      if (type === 1) {
+        this.seenWork = true
+      } else if (type === 2) {
+        this.seenEvent = true
+      }
+      this.current = index
+    },
+    // 鼠标浮动移出触发事件
+    onMouseout () {
+      this.seenWork = false
+      this.seenEvent = false
+      this.current = null
     }
   }
 }
@@ -1134,7 +1213,7 @@ export default {
   font-weight: 400;
   color: #fff;
   line-height: 28px;
-  margin-left: 32px;
+    text-align: center;
 }
 .explain {
   text-align: center;
@@ -1169,4 +1248,78 @@ export default {
         font-weight:400;
         color:rgba(255,85,85,1)
     }
+  .work_img{
+      position:absolute;
+      width: 151px;
+      height: 187px;
+  }
+  .operation{
+      width: 151px;
+      height: 187px;
+      position:absolute;
+      z-index:1;
+      background:rgba(0,0,0,0.5);
+  }
+  .operation div{
+      width:32px;
+      height:32px;
+      background:rgba(153,153,153,1);
+      opacity:0.9;
+      border-radius:50%;
+      margin: 0 auto;
+      text-align: center;
+      line-height:30px;
+      color:rgba(255,255,255,1);
+  }
+  .modify{
+      position: absolute;
+      left: 50%;
+      top: 40%;
+      transform: translate(-50%, -50%);
+      cursor:pointer
+  }
+  .delete{
+      position: absolute;
+      left: 50%;
+      top: 60%;
+      transform: translate(-50%, -50%);
+      cursor:pointer
+  }
+  .event_img{
+      position:absolute;
+      width: 135px;
+      height: 101px;
+  }
+  .eoperation{
+      width: 135px;
+      height: 101px;
+      position:absolute;
+      z-index:1;
+      background:rgba(0,0,0,0.5);
+  }
+  .eoperation div{
+      width:32px;
+      height:32px;
+      background:rgba(153,153,153,1);
+      opacity:0.9;
+      border-radius:50%;
+      margin: 0 auto;
+      text-align: center;
+      line-height:30px;
+      color:rgba(255,255,255,1);
+  }
+  .emodify{
+      position: absolute;
+      left: 35%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      cursor:pointer
+  }
+  .edelete{
+      position: absolute;
+      left: 65%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      cursor:pointer
+  }
 </style>

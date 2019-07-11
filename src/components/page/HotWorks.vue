@@ -446,7 +446,7 @@ export default {
           if (this.event > 0) {
             for (let i = 0; i < this.EventList.length; i++) {
               if (this.EventList[i].id === this.event) {
-                this.EventList[i].works_cover = this.coverFilePortrait
+                this.EventList[i].event_cover = this.coverFilePortrait
               }
             }
           } else {
