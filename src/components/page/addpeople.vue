@@ -139,7 +139,7 @@
       </div>
       <div class="add-back" :show-file-list="false" @mouseenter="fileOnMouseOver(1)" @mouseleave="fileOnMouseOut">
           <div class="exhibition">
-              <img class="cover-works" :src="coverFileReader" alt>
+              <img class="cover-works" :src="coverFileReader" @click="choiceCover" alt>
               <input class="cover" type="file" ref="choiceCoverElem" @change="onCoverChange" accept="image/*">
               <span class="add-picter">+</span>
               <span class="add-picter">添加</span>
@@ -158,7 +158,7 @@
       </div>
       <div class="add-artist" @mouseenter="fileOnMouseOver(2)" @mouseleave="fileOnMouseOut">
           <div class="coverPhoto">
-              <img class="cover-artist" :src="coverFileArtist" alt>
+              <img class="cover-artist" :src="coverFileArtist" @click="choiceCovers" alt>
               <input class="cover" type="file" ref="choiceCoverElems" @change="onCoverArtist" accept="image/*">
               <span class="artist-addto">+</span>
               <span class="artist-addto">添加</span>
