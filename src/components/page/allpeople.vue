@@ -75,7 +75,7 @@ export default {
       let formData = new FormData()
       formData.append('artist_name', this.sear) // 艺人姓名
       formData.append('pageCurrent', this.pageCurrent) // 当前页数
-      this.$axios.request({
+      this.$http.request({
         url: 'actionArtistListApi',
         method: 'POST',
         data: formData
@@ -105,56 +105,73 @@ export default {
     },
     // 删除艺人
     async Deletes (id, index) {
-      let formData = new FormData()
-      formData.append('artist_id', id) // 艺人id
-
-      this.$axios.request({
-        url: 'actionArtistDelApi',
-        method: 'POST',
-        data: formData
-      }).then((res) => {
-        // 处理请求结果
-        if (res.data.code === 200) {
-          // 成功请求到数据后的处理
-          alert(res.data.message)
-          this.people.splice(index, 1)
-        } else {
-          // 请求失败后的处理
-          alert(res.data.message)
-        }
+      let msg = '您确定删除吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        let formData = new FormData()
+        formData.append('artist_id', id) // 艺人id
+        this.$http.request({
+          url: 'actionArtistDelApi',
+          method: 'POST',
+          data: formData
+        }).then((res) => {
+          // 处理请求结果
+          if (res.data.code === 200) {
+            // 成功请求到数据后的处理
+            this.people.splice(index, 1)
+            this.$message.success(res.data.message)
+          } else {
+            // 请求失败后的处理
+            this.$message.error(res.data.message)
+          }
+        })
+      }).catch(() => {
+        console.log('cancel')
       })
     },
     // 艺人推荐/取消推荐
     async Recommend (id, push, index) {
-      let formData = new FormData()
-      formData.append('artist_id', id) // 艺人id
-      let isPush = ''
-      if (push === '0') {
-        isPush = '1' // 艺人推荐状态(成为推荐)
-      } else {
-        isPush = '0' // 艺人推荐状态(取消推荐)
-      }
-      formData.append('is_push', isPush)
-
-      this.$axios.request({
-        url: 'actionArtistPushApi',
-        method: 'POST',
-        data: formData
-      }).then((res) => {
-        // 处理请求结果
-        if (res.data.code === 200) {
-          // 成功请求到数据后的处理
-          alert(res.data.message)
-          this.$set(this.people[index], 'is_push', isPush)
+      let msg = '您确定操作吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        let formData = new FormData()
+        formData.append('artist_id', id) // 艺人id
+        let isPush = ''
+        if (push === '0') {
+          isPush = '1' // 艺人推荐状态(成为推荐)
         } else {
-          // 请求失败后的处理
-          alert(res.data.message)
+          isPush = '0' // 艺人推荐状态(取消推荐)
         }
+        formData.append('is_push', isPush)
+
+        this.$http.request({
+          url: 'actionArtistPushApi',
+          method: 'POST',
+          data: formData
+        }).then((res) => {
+          // 处理请求结果
+          if (res.data.code === 200) {
+            // 成功请求到数据后的处理
+            this.$set(this.people[index], 'is_push', isPush)
+            this.$message.success(res.data.message)
+          } else {
+            // 请求失败后的处理
+            this.$message.error(res.data.message)
+          }
+        })
+      }).catch(() => {
+        console.log('cancel')
       })
     }
   },
   mounted () {
-    this.$axios.request({
+    this.$http.request({
       url: 'actionArtistListApi',
       method: 'POST'
     }).then((res) => {

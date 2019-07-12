@@ -427,40 +427,44 @@ export default {
       let formData = new FormData()
       formData.append('artist_id', this.artist) // 艺人id
       // 艺人基本信息
-      this.$axios.request({
+      this.$http.request({
         url: 'actionArtistDetailsApi',
         method: 'POST',
         data: formData
       }).then((res) => {
         // 处理请求结果
-        this.artistInfo = res.data.data // 基本数据
-        this.platforms = JSON.parse(res.data.data.platform) // 平台信息
-        this.experiences = JSON.parse(res.data.data.award_experience) // 平台信息
-        this.coverFileReader = res.data.data.artist_cover// 艺人首页展示图预览
-        this.coverFileArtist = res.data.data.artist_back// 艺人封面图图预览
-        if (res.data.data.artist_photo) {
-          this.coverFilePortraits = JSON.parse(res.data.data.artist_photo) // 艺人写真预览
+        if (res.data.code === 200) {
+          this.artistInfo = res.data.data // 基本数据
+          this.platforms = JSON.parse(res.data.data.platform) // 平台信息
+          this.experiences = JSON.parse(res.data.data.award_experience) // 平台信息
+          this.coverFileReader = res.data.data.artist_cover// 艺人首页展示图预览
+          this.coverFileArtist = res.data.data.artist_back// 艺人封面图图预览
+          if (res.data.data.artist_photo) {
+            this.coverFilePortraits = JSON.parse(res.data.data.artist_photo) // 艺人写真预览
+          }
         }
-        console.log(res.data.data.artist_photo)
-        console.log(this.coverFilePortraits)
       })
       // 热门作品列表
-      this.$axios.request({
+      this.$http.request({
         url: 'actionArtistWorkListApi',
         method: 'POST',
         data: formData
       }).then((res) => {
         // 处理请求结果
-        this.WorkList = res.data.data // 基本数据
+        if (res.data.code === 200) {
+          this.WorkList = res.data.data // 基本数据
+        }
       })
       // 出席活动列表
-      this.$axios.request({
+      this.$http.request({
         url: 'actionArtistEventListApi',
         method: 'POST',
         data: formData
       }).then((res) => {
         // 处理请求结果
-        this.EventList = res.data.data // 基本数据
+        if (res.data.code === 200) {
+          this.EventList = res.data.data // 基本数据
+        }
       })
     }
   },
@@ -486,16 +490,18 @@ export default {
       let formData = new FormData()
       formData.append('work_id', this.work) // 艺人id
       if (this.work > 0) {
-        this.$axios.request({
+        this.$http.request({
           url: 'actionArtistWorkDetailsApi',
           method: 'POST',
           data: formData
         }).then((res) => {
           // 处理请求结果
-          this.WorkDetail = res.data.data // 基本数据
-          this.work = res.data.data.id // 热门作品id
-          this.coverFileHot = res.data.data.works_cover // 视频封面
-          this.coverFileHots = res.data.data.works_link // 视频文件
+          if (res.data.code === 200) {
+            this.WorkDetail = res.data.data // 基本数据
+            this.work = res.data.data.id // 热门作品id
+            this.coverFileHot = res.data.data.works_cover // 视频封面
+            this.coverFileHots = res.data.data.works_link // 视频文件
+          }
         })
       }
     },
@@ -519,15 +525,17 @@ export default {
       let formData = new FormData()
       formData.append('event_id', this.event) // 艺人id
       if (this.event > 0) {
-        this.$axios.request({
+        this.$http.request({
           url: 'actionArtistEventDetailsApi',
           method: 'POST',
           data: formData
         }).then((res) => {
           // 处理请求结果
-          this.EventDetail = res.data.data // 基本数据
-          this.event = res.data.data.id // 出席活动id
-          this.coverFilePortrait = res.data.data.event_cover // 活动图片
+          if (res.data.code === 200) {
+            this.EventDetail = res.data.data // 基本数据
+            this.event = res.data.data.id // 出席活动id
+            this.coverFilePortrait = res.data.data.event_cover // 活动图片
+          }
         })
       }
     },
@@ -611,110 +619,145 @@ export default {
     },
     // 艺人热门作品添加修改操作
     SaveWorkList () {
-      let formData = new FormData()
-      formData.append('artist_id', this.artist) // 艺人id
-      formData.append('work_id', this.work) // 作品id
-      formData.append('works', this.WorkDetail.works) // 作品名称
-      formData.append('remarks', this.WorkDetail.remarks) // 作品备注
-      formData.append('picfile', this.workPic) // 作品封面
-      formData.append('video', this.workVideo) // 视频文件
-      this.$axios.request({
-        url: 'actionArtistWorkSaveApi',
-        method: 'POST',
-        data: formData
-      }).then((res) => {
-        // 处理请求结果
-        if (res.data.code === 200) {
-          alert(res.data.message)
-          // 将新添加或修改后的数据展示到页面中
-          if (this.work > 0) {
-            for (let i = 0; i < this.WorkList.length; i++) {
-              if (this.WorkList[i].id === this.work) {
-                this.WorkList[i].works_cover = this.coverFileHot
+      let msg = '您确定提交吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        let formData = new FormData()
+        formData.append('artist_id', this.artist) // 艺人id
+        formData.append('work_id', this.work) // 作品id
+        formData.append('works', this.WorkDetail.works) // 作品名称
+        formData.append('remarks', this.WorkDetail.remarks) // 作品备注
+        formData.append('picfile', this.workPic) // 作品封面
+        formData.append('video', this.workVideo) // 视频文件
+        this.$http.request({
+          url: 'actionArtistWorkSaveApi',
+          method: 'POST',
+          data: formData
+        }).then((res) => {
+          // 处理请求结果
+          if (res.data.code === 200) {
+            this.$message.success(res.data.message)
+            // 将新添加或修改后的数据展示到页面中
+            if (this.work > 0) {
+              for (let i = 0; i < this.WorkList.length; i++) {
+                if (this.WorkList[i].id === this.work) {
+                  this.WorkList[i].works_cover = this.coverFileHot
+                }
               }
+            } else {
+              this.WorkList.push({ 'id': res.data.data, 'works_cover': this.coverFileHot })
             }
+            // 关闭热门作品弹窗
+            this.closeCoverUpHot()
           } else {
-            this.WorkList.push({ 'id': res.data.data, 'works_cover': this.coverFileHot })
+            this.$message.error(res.data.message)
           }
-          // 关闭热门作品弹窗
-          this.closeCoverUpHot()
-        } else {
-          alert(res.data.message)
-        }
+        })
+      }).catch(() => {
+        console.log('cancel')
       })
     },
     // 艺人热门作品删除操作
     SaveWorkRemove (id, index) {
-      let formData = new FormData()
-      formData.append('work_id', id) // 热门作品id
-      this.$axios.request({
-        url: 'actionArtistWorkDelApi',
-        method: 'POST',
-        data: formData
-      }).then((res) => {
-        // 处理请求结果
-        if (res.data.code === 200) {
-          // 成功请求到数据后的处理
-          alert(res.data.message)
-          this.WorkDetail.splice(index, 1)
-        } else {
-          // 请求失败后的处理
-          alert(res.data.message)
-        }
+      let msg = '您确定删除吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        let formData = new FormData()
+        formData.append('work_id', id) // 热门作品id
+        this.$http.request({
+          url: 'actionArtistWorkDelApi',
+          method: 'POST',
+          data: formData
+        }).then((res) => {
+          // 处理请求结果
+          if (res.data.code === 200) {
+            // 成功请求到数据后的处理
+            this.$message.success(res.data.message)
+            this.WorkDetail.splice(index, 1)
+          } else {
+            // 请求失败后的处理
+            this.$message.error(res.data.message)
+          }
+        })
+      }).catch(() => {
+        console.log('cancel')
       })
     },
     // 艺人出席活动添加修改操作
     SaveEventList () {
-      let formData = new FormData()
-      formData.append('artist_id', this.artist) // 艺人id
-      formData.append('event_id', this.event) // 出席活动id
-      formData.append('title', this.EventDetail.title) // 活动标题
-      formData.append('jump_link', this.EventDetail.jump_link) // 活动链接
-      formData.append('remarks', this.EventDetail.remarks) // 活动备注
-      formData.append('picfile', this.eventPic) // 活动封面
-      this.$axios.request({
-        url: 'actionArtistWorkSaveApi',
-        method: 'POST',
-        data: formData
-      }).then((res) => {
-        // 处理请求结果
-        if (res.data.code === 200) {
-          alert(res.data.message)
-          // 将新添加或修改后的数据展示到页面中
-          if (this.event > 0) {
-            for (let i = 0; i < this.EventList.length; i++) {
-              if (this.EventList[i].id === this.event) {
-                this.EventList[i].event_cover = this.coverFilePortrait
+      let msg = '您确定提交吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        let formData = new FormData()
+        formData.append('artist_id', this.artist) // 艺人id
+        formData.append('event_id', this.event) // 出席活动id
+        formData.append('title', this.EventDetail.title) // 活动标题
+        formData.append('jump_link', this.EventDetail.jump_link) // 活动链接
+        formData.append('remarks', this.EventDetail.remarks) // 活动备注
+        formData.append('picfile', this.eventPic) // 活动封面
+        this.$http.request({
+          url: 'actionArtistWorkSaveApi',
+          method: 'POST',
+          data: formData
+        }).then((res) => {
+          // 处理请求结果
+          if (res.data.code === 200) {
+            this.$message.success(res.data.message)
+            // 将新添加或修改后的数据展示到页面中
+            if (this.event > 0) {
+              for (let i = 0; i < this.EventList.length; i++) {
+                if (this.EventList[i].id === this.event) {
+                  this.EventList[i].event_cover = this.coverFilePortrait
+                }
               }
-            }
+            } else {
+              this.EventList.push({ 'id': res.data.data, 'event_cover': this.coverFilePortrait })
+            }// 关闭出席活动弹窗
+            this.closeCoverUpHotPicter()
           } else {
-            this.EventList.push({ 'id': res.data.data, 'event_cover': this.coverFilePortrait })
+            this.$message.error(res.data.message)
           }
-          // 关闭出席活动弹窗
-          this.closeCoverUpHotPicter()
-        } else {
-          alert(res.data.message)
-        }
+        })
+      }).catch(() => {
+        console.log('cancel')
       })
     },
     // 艺人热门作品删除操作
     SaveEventRemove (id, index) {
-      let formData = new FormData()
-      formData.append('event_id', id) // 参加活动id
-      this.$axios.request({
-        url: 'actionArtistEventDelApi',
-        method: 'POST',
-        data: formData
-      }).then((res) => {
-        // 处理请求结果
-        if (res.data.code === 200) {
-          // 成功请求到数据后的处理
-          alert(res.data.message)
-          this.EventDetail.splice(index, 1)
-        } else {
-          // 请求失败后的处理
-          alert(res.data.message)
-        }
+      let msg = '您确定删除吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        let formData = new FormData()
+        formData.append('event_id', id) // 参加活动id
+        this.$http.request({
+          url: 'actionArtistEventDelApi',
+          method: 'POST',
+          data: formData
+        }).then((res) => {
+          // 处理请求结果
+          if (res.data.code === 200) {
+            // 成功请求到数据后的处理
+            this.$message.success(res.data.message)
+            this.EventDetail.splice(index, 1)
+          } else {
+            // 请求失败后的处理
+            this.$message.error(res.data.message)
+          }
+        })
+      }).catch(() => {
+        console.log('cancel')
       })
     },
     // 添加平台信息文本框
@@ -918,29 +961,36 @@ export default {
       }
       formData.append('platform', JSON.stringify(this.platforms)) // 平台信息
       formData.append('award_experience', JSON.stringify(this.experiences)) // 艺人获奖经历
-      this.$axios.request({
-        url: 'actionArtistSaveApi',
-        method: 'POST',
-        data: formData
-      }).then((res) => {
-        // 处理请求结果
-        if (res.data.code === 200) {
-          alert(res.data.message)
-          if (this.artist > 0) {
-            // 修改操作跳转至列表页
-            this.$router.push({ path: '/allpeople' })
+      let msg = '您确定提交吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        this.$http.request({
+          url: 'actionArtistSaveApi',
+          method: 'POST',
+          data: formData
+        }).then((res) => {
+          // 处理请求结果
+          if (res.data.code === 200) {
+            this.$message.success(res.data.message)
+            if (this.artist > 0) {
+              // 修改操作跳转至列表页
+              this.$router.push({ path: '/allpeople' })
+            } else {
+              // 添加操作跳转至艺人作品和艺人活动页
+              this.$router.push({ path: '/HotWorks',
+                name: 'HotWorks',
+                query: { artist: res.data.data.artist_id }
+              })
+            }
           } else {
-            // 添加操作跳转至艺人作品和艺人活动页
-            this.$router.push({ path: '/HotWorks',
-              name: 'HotWorks',
-              query: {
-                artist: res.data.data.artist_id
-              }
-            })
+            this.$message.error(res.data.message)
           }
-        } else {
-          alert(res.data.message)
-        }
+        })
+      }).catch(() => {
+        console.log('cancel')
       })
     },
     // 艺人首页，艺人封面鼠标移入时触发事件
