@@ -204,7 +204,12 @@ export default {
     },
 
     bannerDel (banner_id, _index) { // banner 删除
-      if (confirm('确定删除该banner吗?')) {
+      let msg = '您确定要删除吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
         let formData = new FormData()
         formData.append('banner_id', banner_id)
         this.$http
@@ -216,18 +221,27 @@ export default {
           .then(res => {
             this.isCoverUploadDialogShow = false
             if (res.data.code === 200) {
-              alert('删除成功')
+              this.$message({
+                message: '恭喜你，删除成功',
+                type: 'success'
+              })
               this.bannerList.splice(_index, 1)
             } else {
-              alert('删除失败')
+              this.$message.error('请联系管理员，删除失败')
             }
           })
-      }
+      }).catch(() => {
+        console.log('cancel')
+      })
     },
     bannerTop (banner_id) { // 置顶
-      if (confirm('确定要置顶该banner吗?')) {
+      let msg = '您确定要置顶吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
         let formData = new FormData()
-
         formData.append('banner_id', banner_id)
         this.$http
           .request({
@@ -238,22 +252,33 @@ export default {
           .then(res => {
             this.isCoverUploadDialogShow = false
             if (res.data.code === 200) {
-              alert('置顶成功')
+              this.$message({
+                message: '恭喜你，置顶成功',
+                type: 'success'
+              })
               this.reload()
             } else {
-              alert('置顶失败')
+              this.$message.error('请联系管理员，置顶失败')
             }
           })
-      }
+      }).catch(() => {
+        console.log('cancel')
+      })
     },
 
     bannerStatus (banner_id, banner_status) { // 上架和下架
       if (banner_status == '1') {
+
         var txt = '确定要上架该Banner吗?'
       } else {
+
         var txt = '确定要下架该Banner吗?'
       }
-      if (confirm(txt)) {
+      this.$confirm(txt, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
         let formData = new FormData()
         formData.append('banner_status', banner_status)
         formData.append('banner_id', banner_id)
@@ -265,13 +290,18 @@ export default {
           })
           .then(res => {
             if (res.data.code === 200) {
-              alert('操作成功')
+              this.$message({
+                message: '恭喜你，操作成功',
+                type: 'success'
+              })
               this.reload()
             } else {
-              alert('操作失败')
+              this.$message.error('请联系管理员，操作失败')
             }
           })
-      }
+      }).catch(() => {
+        console.log('cancel')
+      })
     },
     submitSave () { // 点击确认按钮时进行信息验证
       if (!this.title) {
@@ -298,7 +328,12 @@ export default {
       } else {
         this.upload_file = ''
       }
-      if (confirm('确定要提交吗?')) {
+      let msg = '确定要提交吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
         let formData = new FormData()
         formData.append('banner_id', this.banner_id)
         formData.append('title', this.title)
@@ -315,13 +350,18 @@ export default {
           .then(res => {
             console.log(res)
             if (res.data.code === 200) {
-              alert('操作成功')
+              this.$message({
+                message: '恭喜你，操作成功',
+                type: 'success'
+              })
               this.reload()
             } else {
-              alert('操作失败')
+              this.$message.error('请联系管理员，操作失败')
             }
           })
-      }
+      }).catch(() => {
+        console.log('cancel')
+      })
     }
   },
   mounted () {
@@ -376,13 +416,20 @@ export default {
     padding-left: 15px;
   }
 
+  .el-message-box__wrapper{
+    z-index: 2013 !important;
+  }
+  .v-modal{
+    z-index: 2011 !important;
+  }
+
   .el-message-box__message p {
-    text-align: right;
+    text-align: left !important;
   }
 
   .el-message-box {
     width: 800px;
-    height: 460px;
+    height: 128px !important;
   }
 
   .el-message-box__message textarea {
@@ -514,4 +561,5 @@ export default {
     height: 82px;
     object-fit: cover;
   }
+
 </style>

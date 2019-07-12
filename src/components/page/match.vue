@@ -143,6 +143,11 @@ export default {
     }
   },
   methods: {
+
+    handleCurrentChange (val) {
+      this.pageCurrent = val
+      this.search()
+    },
     // 点击显示弹窗
     addMatch (event_type, event_id) {
       this.isMatchShow = true
@@ -221,45 +226,18 @@ export default {
         })
     },
     search () {
-      if (!this.searchTitle) {
-        alert('请填写赛事名称进行搜索')
-        return false
-      }
-      let formData = new FormData()
-      formData.append('title', this.searchTitle)
-      formData.append('pageCurrent', this.pageCurrent) // 当前页数
-      this.$http
-        .request({
-          url: 'actionEventListApi',
-          method: 'post',
-          data: formData
-        })
-        .then(res => {
-          if (res.data.code === 200) {
-            this.eventList = res.data.data.result
-            this.eventPage = res.data.data.PageList
-          }
-        })
+      this.default(this.searchTitle)
     },
     cancel () {
-      this.searchTitle = ''
-      let formData = new FormData()
-      formData.append('pageCurrent', this.pageCurrent) // 当前页数
-      this.$http
-        .request({
-          url: 'actionEventListApi',
-          method: 'post',
-          data: formData
-        })
-        .then(res => {
-          if (res.data.code === 200) {
-            this.eventList = res.data.data.result
-            this.eventPage = res.data.data.PageList
-          }
-        })
+      this.default()
     },
     eventDel (event_id) {
-      if (confirm('确定要删除吗?')) {
+      let msg = '您确定要删除吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
         let formData = new FormData()
         formData.append('event_id', event_id)
 
@@ -272,13 +250,18 @@ export default {
           .then(res => {
             console.log(res)
             if (res.data.code === 200) {
-              alert('操作成功')
+              this.$message({
+                message: '恭喜你，删除成功',
+                type: 'success'
+              })
               this.reload()
             } else {
-              alert('操作失败')
+              this.$message.error('请联系管理员，删除失败')
             }
           })
-      }
+      }).catch(() => {
+        console.log('cancel')
+      })
     },
     eventCheck () {
       if (!this.title) {
@@ -311,7 +294,12 @@ export default {
       } else {
         this.msgcover_link = ''
       }
-      if (confirm('确定要提交吗?')) {
+      let msg = '您确定要提交吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
         let formData = new FormData()
         formData.append('title', this.title)
         formData.append('jump_link', this.jump_link)
@@ -328,13 +316,18 @@ export default {
           .then(res => {
             console.log(res)
             if (res.data.code === 200) {
-              alert('操作成功')
+              this.$message({
+                message: '恭喜你，操作成功',
+                type: 'success'
+              })
               this.reload()
             } else {
-              alert('操作失败')
+              this.$message.error('请联系管理员，操作失败')
             }
           })
-      }
+      }).catch(() => {
+        console.log('cancel')
+      })
     }
 
   },
@@ -382,6 +375,10 @@ export default {
     cursor: pointer;
   }
 
+  .el-pagination {
+    margin-top: 35px !important;
+  }
+
   .elastic {
     position: fixed;
     top: 0;
@@ -389,7 +386,7 @@ export default {
     left: 0;
     right: 0;
     width: 599px;
-    height: 510px;
+    height: 531px !important;
     background: #fff;
     margin: 40px auto;
     border-radius: 2px;

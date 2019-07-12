@@ -85,250 +85,287 @@
 </template>
 
 <script>
-  export default {
-    inject: ['reload'],
-    data () {
-      return {
-        bannerList: [],
-        isMatchShowHomePage: false,
-        coverFilePortraitHomePage: '',
-        title: '',
-        msgtitle: '',
-        jump_link: '',
-        msgjump_link: '',
-        remarks: '',
-        msgremarks: '',
-        cover: null,
-        file: '',
-        topic: '',
-        banner_id: '',
-        upload_file: ''
-      }
-    },
-    filters: {
-      formatDate: function (value) {
-        value *= 1000
-        let date = new Date(value)
-        // 注意对方给你的是毫秒还是秒，如果是毫秒需要转秒（*1000）
-        let y = date.getFullYear()
-        let MM = date.getMonth() + 1
-        MM = MM < 10 ? ('0' + MM) : MM
-        let d = date.getDate()
-        d = d < 10 ? ('0' + d) : d
-        let h = date.getHours()
-        h = h < 10 ? ('0' + h) : h
-        let m = date.getMinutes()
-        m = m < 10 ? ('0' + m) : m
-        let s = date.getSeconds()
-        s = s < 10 ? ('0' + s) : s
-        return y + '-' + MM + '-' + d + ' ' + h + ':' + m + ':' + s
-      }
-    },
-    methods: {
-      async default () {
-        let formData = new FormData()
+export default {
+  inject: ['reload'],
+  data () {
+    return {
+      bannerList: [],
+      isMatchShowHomePage: false,
+      coverFilePortraitHomePage: '',
+      title: '',
+      msgtitle: '',
+      jump_link: '',
+      msgjump_link: '',
+      remarks: '',
+      msgremarks: '',
+      cover: null,
+      file: '',
+      topic: '',
+      banner_id: '',
+      upload_file: ''
+    }
+  },
+  filters: {
+    formatDate: function (value) {
+      value *= 1000
+      let date = new Date(value)
+      // 注意对方给你的是毫秒还是秒，如果是毫秒需要转秒（*1000）
+      let y = date.getFullYear()
+      let MM = date.getMonth() + 1
+      MM = MM < 10 ? ('0' + MM) : MM
+      let d = date.getDate()
+      d = d < 10 ? ('0' + d) : d
+      let h = date.getHours()
+      h = h < 10 ? ('0' + h) : h
+      let m = date.getMinutes()
+      m = m < 10 ? ('0' + m) : m
+      let s = date.getSeconds()
+      s = s < 10 ? ('0' + s) : s
+      return y + '-' + MM + '-' + d + ' ' + h + ':' + m + ':' + s
+    }
+  },
+  methods: {
+    async default () {
+      let formData = new FormData()
 
-        formData.append('banner_type', 2)
+      formData.append('banner_type', 2)
+      this.$http
+        .request({
+          url: 'actionBannerListApi',
+          method: 'post',
+          data: formData
+        })
+        .then(res => {
+          if (res.data.code === 200) {
+            this.bannerList = res.data.data
+          }
+        })
+    },
+    addHomePage (banner_id) {
+      this.isMatchShowHomePage = true
+      if (banner_id == '0') { // 添加banner
+        this.topic = '添加banner'
+        this.banner_id = ''
+        this.title = ''
+        this.jump_link = ''
+        this.remarks = ''
+        this.coverFilePortraitHomePage = ''
+      } else { // 编辑banner
+        this.topic = '编辑banner'
+        this.banner_id = banner_id
+        let formData = new FormData()
+        formData.append('banner_id', banner_id)
         this.$http
           .request({
-            url: 'actionBannerListApi',
+            url: 'actionBannerDetailsApi ',
             method: 'post',
             data: formData
           })
           .then(res => {
             if (res.data.code === 200) {
-              this.bannerList = res.data.data
+              this.title = res.data.data.title
+              this.jump_link = res.data.data.jump_link
+              this.remarks = res.data.data.remarks
+              this.coverFilePortraitHomePage = res.data.data.cover_link
             }
           })
-      },
-      addHomePage (banner_id) {
-        this.isMatchShowHomePage = true
-        if (banner_id == '0') { // 添加banner
-          this.topic = '添加banner'
-          this.banner_id = ''
-          this.title = ''
-          this.jump_link = ''
-          this.remarks = ''
-          this.coverFilePortraitHomePage = ''
-        } else { // 编辑banner
-          this.topic = '编辑banner'
-          this.banner_id = banner_id
-          let formData = new FormData()
-          formData.append('banner_id', banner_id)
-          this.$http
-            .request({
-              url: 'actionBannerDetailsApi ',
-              method: 'post',
-              data: formData
-            })
-            .then(res => {
-              if (res.data.code === 200) {
-                this.title = res.data.data.title
-                this.jump_link = res.data.data.jump_link
-                this.remarks = res.data.data.remarks
-                this.coverFilePortraitHomePage = res.data.data.cover_link
-              }
-            })
-        }
-      },
-      // 关闭弹窗
-      closeCoverUpHomePage () {
-        this.isMatchShowHomePage = false
-      },
-      // 上传封面
-      onCoverPortraitHomePage (e) {
-        let _file = e.target.files[0]
-        // 判断文件大小是否超出限制
-        if (_file.size > 1024 * 1024) {
-          this.$refs.videoElem.value = ''
-          this.toast = this.$createToast({
-            time: 2000,
-            txt: '文件大小超过1M',
-            type: 'txt'
-          })
-        } else {
-          this.cover = _file
-          let _this = this
-          if (!e || !window.FileReader) {
-            return
-          } // 看支持不支持FileReader
-          let reader = new FileReader()
-          reader.readAsDataURL(_file)
-          reader.onloadend = function () {
-            _this.coverFilePortraitHomePage = this.result
-          }
-        }
-      },
-      choiceCover () {
-        this.$refs.choiceCoverElem.dispatchEvent(new MouseEvent('click'))
-      },
-
-      bannerDel (banner_id, _index) { // banner 删除
-        if (confirm('确定删除该banner吗?')) {
-          let formData = new FormData()
-          formData.append('banner_id', banner_id)
-          this.$http
-            .request({
-              url: 'actionBannerDelApi ',
-              method: 'post',
-              data: formData
-            })
-            .then(res => {
-              this.isCoverUploadDialogShow = false
-              if (res.data.code === 200) {
-                alert('删除成功')
-                this.bannerList.splice(_index, 1)
-              } else {
-                alert('删除失败')
-              }
-            })
-        }
-      },
-      bannerTop (banner_id) { // 置顶
-        if (confirm('确定要置顶该banner吗?')) {
-          let formData = new FormData()
-
-          formData.append('banner_id', banner_id)
-          this.$http
-            .request({
-              url: 'actionBannerTopping ',
-              method: 'post',
-              data: formData
-            })
-            .then(res => {
-              this.isCoverUploadDialogShow = false
-              if (res.data.code === 200) {
-                alert('置顶成功')
-                this.reload()
-              } else {
-                alert('置顶失败')
-              }
-            })
-        }
-      },
-
-      bannerStatus (banner_id, banner_status) { // 上架和下架
-        if (banner_status == '1') {
-          var txt = '确定要上架该Banner吗?'
-        } else {
-          var txt = '确定要下架该Banner吗?'
-        }
-        if (confirm(txt)) {
-          let formData = new FormData()
-          formData.append('banner_status', banner_status)
-          formData.append('banner_id', banner_id)
-          this.$http
-            .request({
-              url: 'actionBannerStatusApi',
-              method: 'post',
-              data: formData
-            })
-            .then(res => {
-              if (res.data.code === 200) {
-                alert('操作成功')
-                this.reload()
-              } else {
-                alert('操作失败')
-              }
-            })
-        }
-      },
-      submitSave () { // 点击确认按钮时进行信息验证
-        if (!this.title) {
-          this.msgtitle = '请填写标题'
-          return false
-        } else {
-          this.msgtitle = ''
-        }
-        if (!this.jump_link) {
-          this.msgjump_link = '请填写链接地址'
-          return false
-        } else {
-          this.msgjump_link = ''
-        }
-        if (!this.remarks) {
-          this.msgremarks = '请填写备注说明'
-          return false
-        } else {
-          this.msgremarks = ''
-        }
-        if (!this.coverFilePortraitHomePage) {
-          this.upload_file = '请上传文件'
-          return false
-        } else {
-          this.upload_file = ''
-        }
-        if (confirm('确定要提交吗?')) {
-          let formData = new FormData()
-          formData.append('banner_id', this.banner_id)
-          formData.append('title', this.title)
-          formData.append('jump_link', this.jump_link)
-          formData.append('remarks', this.remarks)
-          formData.append('picfile', this.cover)
-          formData.append('banner_type', 2)
-          this.$http
-            .request({
-              url: 'actionBannerSaveApi',
-              method: 'post',
-              data: formData
-            })
-            .then(res => {
-              this.isCoverUploadDialogShow = false
-              console.log(res)
-              if (res.data.code === 200) {
-                alert('操作成功')
-                this.reload()
-              } else {
-                alert('操作失败')
-              }
-            })
+      }
+    },
+    // 关闭弹窗
+    closeCoverUpHomePage () {
+      this.isMatchShowHomePage = false
+    },
+    // 上传封面
+    onCoverPortraitHomePage (e) {
+      let _file = e.target.files[0]
+      // 判断文件大小是否超出限制
+      if (_file.size > 1024 * 1024) {
+        this.$refs.videoElem.value = ''
+        this.toast = this.$createToast({
+          time: 2000,
+          txt: '文件大小超过1M',
+          type: 'txt'
+        })
+      } else {
+        this.cover = _file
+        let _this = this
+        if (!e || !window.FileReader) {
+          return
+        } // 看支持不支持FileReader
+        let reader = new FileReader()
+        reader.readAsDataURL(_file)
+        reader.onloadend = function () {
+          _this.coverFilePortraitHomePage = this.result
         }
       }
     },
-    mounted () {
-      this.default()
+    choiceCover () {
+      this.$refs.choiceCoverElem.dispatchEvent(new MouseEvent('click'))
+    },
+
+    bannerDel (banner_id, _index) { // banner 删除
+      let msg = '您确定要删除吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
+        let formData = new FormData()
+        formData.append('banner_id', banner_id)
+        this.$http
+          .request({
+            url: 'actionBannerDelApi ',
+            method: 'post',
+            data: formData
+          })
+          .then(res => {
+            this.isCoverUploadDialogShow = false
+            if (res.data.code === 200) {
+              this.$message({
+                message: '恭喜你，删除成功',
+                type: 'success'
+              })
+              this.bannerList.splice(_index, 1)
+            } else {
+              this.$message.error('请联系管理员，删除失败')
+            }
+          })
+      }).catch(() => {
+        console.log('cancel')
+      })
+    },
+    bannerTop (banner_id) { // 置顶
+      let msg = '您确定要置顶吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
+        let formData = new FormData()
+        formData.append('banner_id', banner_id)
+        this.$http
+          .request({
+            url: 'actionBannerTopping ',
+            method: 'post',
+            data: formData
+          })
+          .then(res => {
+            this.isCoverUploadDialogShow = false
+            if (res.data.code === 200) {
+              this.$message({
+                message: '恭喜你，置顶成功',
+                type: 'success'
+              })
+              this.reload()
+            } else {
+              this.$message.error('请联系管理员，置顶失败')
+            }
+          })
+      }).catch(() => {
+        console.log('cancel')
+      })
+    },
+
+    bannerStatus (banner_id, banner_status) { // 上架和下架
+      if (banner_status == '1') {
+        var txt = '确定要上架该Banner吗?'
+      } else {
+        var txt = '确定要下架该Banner吗?'
+      }
+      this.$confirm(txt, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
+        let formData = new FormData()
+        formData.append('banner_status', banner_status)
+        formData.append('banner_id', banner_id)
+        this.$http
+          .request({
+            url: 'actionBannerStatusApi',
+            method: 'post',
+            data: formData
+          })
+          .then(res => {
+            if (res.data.code === 200) {
+              this.$message({
+                message: '恭喜你，操作成功',
+                type: 'success'
+              })
+              this.reload()
+            } else {
+              this.$message.error('请联系管理员，操作失败')
+            }
+          })
+      }).catch(() => {
+        console.log('cancel')
+      })
+    },
+    submitSave () { // 点击确认按钮时进行信息验证
+      if (!this.title) {
+        this.msgtitle = '请填写标题'
+        return false
+      } else {
+        this.msgtitle = ''
+      }
+      if (!this.jump_link) {
+        this.msgjump_link = '请填写链接地址'
+        return false
+      } else {
+        this.msgjump_link = ''
+      }
+      if (!this.remarks) {
+        this.msgremarks = '请填写备注说明'
+        return false
+      } else {
+        this.msgremarks = ''
+      }
+      if (!this.coverFilePortraitHomePage) {
+        this.upload_file = '请上传文件'
+        return false
+      } else {
+        this.upload_file = ''
+      }
+      let msg = '确定要提交吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
+        let formData = new FormData()
+        formData.append('banner_id', this.banner_id)
+        formData.append('title', this.title)
+        formData.append('jump_link', this.jump_link)
+        formData.append('remarks', this.remarks)
+        formData.append('picfile', this.cover)
+        formData.append('banner_type', 2)
+        this.$http
+          .request({
+            url: 'actionBannerSaveApi',
+            method: 'post',
+            data: formData
+          })
+          .then(res => {
+            console.log(res)
+            if (res.data.code === 200) {
+              this.$message({
+                message: '恭喜你，操作成功',
+                type: 'success'
+              })
+              this.reload()
+            } else {
+              this.$message.error('请联系管理员，操作失败')
+            }
+          })
+      }).catch(() => {
+        console.log('cancel')
+      })
     }
+  },
+  mounted () {
+    this.default()
   }
+}
 </script>
 <style>
   .tip {
@@ -378,12 +415,12 @@
   }
 
   .el-message-box__message p {
-    text-align: right;
+    text-align: left !important;
   }
 
   .el-message-box {
     width: 800px;
-    height: 460px;
+    height: 128px !important;
   }
 
   .el-message-box__message textarea {
@@ -515,4 +552,5 @@
     height: 82px;
     object-fit: cover;
   }
+
 </style>

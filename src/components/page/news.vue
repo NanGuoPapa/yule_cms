@@ -36,14 +36,15 @@
             </tr>
             </tbody>
           </table>
+          <el-pagination
+            @current-change="handleCurrentChange"
+            layout="prev, pager, next, jumper"
+            :total="newsPage.pageNumber * 10">
+          </el-pagination>
         </div>
       </el-card>
     </div>
-    <el-pagination
-      @current-change="handleCurrentChange"
-      layout="prev, pager, next, jumper"
-      :total="eventPage.pageNumber * 10">
-    </el-pagination>
+
     <!-- 添加赛事弹框 -->
     <div v-show="isPerformerShow">
       <div class="elastic" style="z-index: 2011;">
@@ -107,7 +108,7 @@ export default {
       msgnews_introduction: '',
       msgcover_link: '',
       isPerformerShow: false,
-      newSPage: [],
+      newsPage: [],
       pageCurrent: '',
       coverFilePortraitNews: ''
     }
@@ -132,6 +133,11 @@ export default {
     }
   },
   methods: {
+
+    handleCurrentChange (val) {
+      this.pageCurrent = val
+      this.search()
+    },
     // 点击显示弹窗
     addNews (news_type, news_id) {
       this.isPerformerShow = true
@@ -183,28 +189,18 @@ export default {
         })
     },
     search () {
-      if (!this.searchTitle) {
-        alert('请填写新闻标题进行搜索')
-        return false
-      }
       let formData = new FormData()
       formData.append('pageCurrent', this.pageCurrent) // 当前页数
-      formData.append('title', this.searchTitle)
-      this.$http
-        .request({
-          url: 'actionNewsListApi',
-          method: 'post',
-          data: formData
-        })
-        .then(res => {
-          if (res.data.code === 200) {
-            this.newsList = res.data.data.result
-            this.newsPage = res.data.data.PageList
-          }
-        })
+
+      this.default(this.searchTitle)
     },
     newsDel (news_id) {
-      if (confirm('确定要删除吗?')) {
+      let msg = '确定要删除吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
         let formData = new FormData()
         formData.append('news_id', news_id)
 
@@ -217,30 +213,21 @@ export default {
           .then(res => {
             console.log(res)
             if (res.data.code === 200) {
-              alert('操作成功')
+              this.$message({
+                message: '恭喜你，删除成功',
+                type: 'success'
+              })
               this.reload()
             } else {
-              alert('操作失败')
+              this.$message.error('请联系管理员，操作失败')
             }
           })
-      }
+      }).catch(() => {
+        console.log('cancel')
+      })
     },
     cancel () {
-      this.searchTitle = ''
-      let formData = new FormData()
-      formData.append('pageCurrent', this.pageCurrent) // 当前页数
-      this.$http
-        .request({
-          url: 'actionNewsListApi',
-          method: 'post',
-          data: formData
-        })
-        .then(res => {
-          if (res.data.code === 200) {
-            this.newsList = res.data.data.result
-            this.newsList = res.data.data.result
-          }
-        })
+      this.default()
     },
     newsSave () {
       if (!this.title) {
@@ -267,7 +254,12 @@ export default {
       } else {
         this.msgcover_link = ''
       }
-      if (confirm('确定要提交吗?')) {
+      let msg = '确定要提交吗?'
+      this.$confirm(msg, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => { // 这里加个 async，可以查下相关文档 async...await
         let formData = new FormData()
         formData.append('title', this.title)
         formData.append('jump_link', this.jump_link)
@@ -283,13 +275,18 @@ export default {
           .then(res => {
             console.log(res)
             if (res.data.code === 200) {
-              alert('操作成功')
+              this.$message({
+                message: '恭喜你，操作成功',
+                type: 'success'
+              })
               this.reload()
             } else {
-              alert('操作失败')
+              this.$message.error('请联系管理员，操作失败')
             }
           })
-      }
+      }).catch(() => {
+        console.log('cancel')
+      })
     },
     // 关闭上传封面弹窗
     closeCoverUploadDialog () {
