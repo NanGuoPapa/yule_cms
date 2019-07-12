@@ -34,7 +34,7 @@
                   <img class="work_img" :src="item.works_cover">
               </div>
                 <div class="operation" v-show="seenWork && index === current">
-                    <div class="modify" @click="artistCoverHot(item.id)">修改</div>
+                    <div class="modify" @click="artistCoverHot(item.id)">替换</div>
                     <div class="delete" @click="SaveWorkRemove(item.id, index)">删除</div>
                 </div>
             </div>
@@ -63,7 +63,7 @@
                 <img class="event_img" :src="item.event_cover">
               </div>
                 <div class="eoperation" v-show="seenEvent && index === current">
-                    <div class="emodify" @click="artistCoverHotPicter(item.id)">修改</div>
+                    <div class="emodify" @click="artistCoverHotPicter(item.id)">替换</div>
                     <div class="edelete" @click="SaveEventRemove(item.id, index)">删除</div>
                 </div>
             </div>

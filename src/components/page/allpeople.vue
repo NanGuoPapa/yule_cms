@@ -31,21 +31,17 @@
               <td>{{item.ctime}}</td>
               <td>{{item.artist_introduction}}</td>
               <td class="look">
-                <a href="" @click="Details">查看详情 </a>
-                <a href="" @click="Edit(item.id)">编辑</a>
-                <a href="" @click="Deletes(item.id,index)">删除</a>
-                <a href="" @click="Recommend(item.id, item.is_push)" v-if="item.is_push == 0">推荐</a>
-                <a href="" @click="Recommend(item.id, item.is_push)" v-else>取消推荐</a>
+                <a href="javascript:;" @click="Details">查看详情 </a>
+                <a href=" " @click="Edit(item.id)">编辑</a>
+                <a href="javascript:;" @click="Deletes(item.id,index)">删除</a>
+                <a href="javascript:;" @click="Recommend(item.id, item.is_push, index)" v-if="item.is_push === '0'">推荐</a>
+                <a href="javascript:;" @click="Recommend(item.id, item.is_push, index)" v-else>取消推荐</a>
               </td>
             </tr>
             </tbody>
           </table>
           <div class="block">
-            <el-pagination
-              @current-change="handleCurrentChange"
-              layout="prev, pager, next, jumper"
-              :total="peoplePage.pageNumber * 10">
-            </el-pagination>
+            <el-pagination @current-change="handleCurrentChange" layout="prev, pager, next, jumper" :total="peoplePage.pageNumber * 10"></el-pagination>
           </div>
         </div>
       </el-card>
@@ -129,14 +125,16 @@ export default {
       })
     },
     // 艺人推荐/取消推荐
-    async Recommend (id, push) {
+    async Recommend (id, push, index) {
       let formData = new FormData()
       formData.append('artist_id', id) // 艺人id
-      if (push === 0) {
-        formData.append('is_push', 1) // 艺人推荐状态(成为推荐)
+      let isPush = ''
+      if (push === '0') {
+        isPush = '1' // 艺人推荐状态(成为推荐)
       } else {
-        formData.append('is_push', 0) // 艺人推荐状态(取消推荐)
+        isPush = '0' // 艺人推荐状态(取消推荐)
       }
+      formData.append('is_push', isPush)
 
       this.$axios.request({
         url: 'actionArtistPushApi',
@@ -147,6 +145,7 @@ export default {
         if (res.data.code === 200) {
           // 成功请求到数据后的处理
           alert(res.data.message)
+          this.$set(this.people[index], 'is_push', isPush)
         } else {
           // 请求失败后的处理
           alert(res.data.message)

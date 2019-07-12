@@ -137,19 +137,16 @@
             <span class="wrong">{{picfileText}}</span>
         </div>
       </div>
-      <div class="add-back" :show-file-list="false">
-        <img class="cover-works" :src="coverFileReader" @click="choiceCover" alt>
-        <div class="replace1">
-        </div>
-        <input
-          class="cover"
-          type="file"
-          ref="choiceCoverElem"
-          @change="onCoverChange"
-          accept="image/*"
-        >
-        <span class="add-picter">+</span>
-        <span class="add-picter">添加</span>
+      <div class="add-back" :show-file-list="false" @mouseenter="fileOnMouseOver(1)" @mouseleave="fileOnMouseOut">
+          <div class="exhibition">
+              <img class="cover-works" :src="coverFileReader" alt>
+              <input class="cover" type="file" ref="choiceCoverElem" @change="onCoverChange" accept="image/*">
+              <span class="add-picter">+</span>
+              <span class="add-picter">添加</span>
+          </div>
+          <div class="exhibitions" v-show="seenPicfile">
+              <div class="replace" @click="choiceCover">替换</div>
+          </div>
       </div>
       <!-- 艺人封面 -->
       <div class="basic">
@@ -159,17 +156,16 @@
             <span class="wrong">{{backfileText}}</span>
         </div>
       </div>
-      <div class="add-artist"  >
-        <img class="cover-artist" :src="coverFileArtist" @click="choiceCovers" alt>
-        <input
-          class="cover"
-          type="file"
-          ref="choiceCoverElems"
-          @change="onCoverArtist"
-          accept="image/*"
-        >
-        <span class="artist-addto">+</span>
-        <span class="artist-addto">添加</span>
+      <div class="add-artist" @mouseenter="fileOnMouseOver(2)" @mouseleave="fileOnMouseOut">
+          <div class="coverPhoto">
+              <img class="cover-artist" :src="coverFileArtist" alt>
+              <input class="cover" type="file" ref="choiceCoverElems" @change="onCoverArtist" accept="image/*">
+              <span class="artist-addto">+</span>
+              <span class="artist-addto">添加</span>
+          </div>
+          <div class="coverPhotos" v-show="seenBackfile">
+              <div class="replace" @click="choiceCovers">替换</div>
+          </div>
       </div>
       <!-- 艺人写真 -->
       <div class="basic">
@@ -180,23 +176,19 @@
         </div>
       </div>
       <div  class="add-backs" :show-file-list="false">
-        <input
-          class="cover"
-          type="file"
-          ref="choiceCoverElem"
-          @change="onCoverPortrait"
-          accept="image/*"
-          multiple="multiple"
-        >
+          <input class="cover" type="file" ref="choiceCoverElemUpdate" @change="onCoverPortraits" accept="image/*" multiple="multiple">
+          <input class="cover" type="file" ref="choiceCoverElemPortrait" @change="onCoverPortrait" accept="image/*" multiple="multiple">
         <span class="add-picter">+</span>
         <span class="add-picter">添加</span>
       </div>
       <div class="all_picter">
         <ul class="picter_ul">
-          <li style="display: inline-block;" class="more_picter" v-for="(item, index) in coverFilePortraits" :key="index">
-            <div >
-              <img class="cover-all" :src="item" @click="choiceCover" alt>
-            </div>
+          <li style="display: inline-block;" class="more_picter" v-for="(item, index) in coverFilePortraits" :key="index" @mouseenter="onMouseover(index,3)" @mouseleave="onMouseout">
+              <img class="cover-all" :src="item" alt>
+              <div class="portrait-all" v-show="seenPortrait && index === current">
+                  <div class="modify" @click="choiceCoverPortrait(index)">替换</div>
+                  <div class="delete" @click="artistPhotoRemove(index)">删除</div>
+              </div>
           </li>
         </ul>
       </div>
@@ -241,7 +233,7 @@
                             <img class="work_img" :src="item.works_cover">
                         </div>
                         <div class="operation" v-show="seenWork && index === current">
-                            <div class="modify" @click="artistCoverHot(item.id)">修改</div>
+                            <div class="modify" @click="artistCoverHot(item.id)">替换</div>
                             <div class="delete" @click="SaveWorkRemove(item.id, index)">删除</div>
                         </div>
                     </div>
@@ -270,7 +262,7 @@
                             <img class="event_img" :src="item.event_cover">
                         </div>
                         <div class="eoperation" v-show="seenEvent && index === current">
-                            <div class="emodify" @click="artistCoverHotPicter(item.id)">修改</div>
+                            <div class="emodify" @click="artistCoverHotPicter(item.id)">替换</div>
                             <div class="edelete" @click="SaveEventRemove(item.id, index)">删除</div>
                         </div>
                     </div>
@@ -312,10 +304,10 @@
           <span class="cover-small">尺寸：400*600px</span>
           <span class="video-small">尺寸：400*600px</span>
           <div class="cover-picter">
-            <img class="coverhots" :src="coverFileHot" @click="choiceCover" alt>
+            <img class="coverhots" :src="coverFileHot" alt>
           </div>
           <div class="cover-picters">
-            <video class="coverhot" :src="coverFileHots" @click="choiceCover" alt></video>
+            <video class="coverhot" :src="coverFileHots" alt></video>
           </div>
           <div class="footer">
             <span class="abolish" @click="closeCoverUpHot">取消</span>
@@ -383,41 +375,6 @@
       <span>条款</span>
       <p class="tiansin">copyright 2019 北京天率科技有限公司出品</p>
     </div>
-    <!-- 添加艺人封面弹窗 -->
-    <div v-show="isPerformerShow">
-      <div class="elastic" style="z-index: 2011;">
-        <div class="border-bott">
-          <span class="addmatch">添加艺人封面</span>
-          <span @click="closeCoverUpActor" class="icon">×</span>
-        </div>
-        <div class="content-news">
-          <span class="must">*</span>
-          <span class="news">跳转链接 :</span>
-          <input class="butto" type="text" placeholder="请输入跳转链接">
-        </div>
-        <div class="content-news">
-          <span class="must"></span>
-          <span class="news">备注说明 :</span>
-          <textarea class="entering" cols="330" rows="81" placeholder="请输入备注信息"></textarea>
-        </div>
-        <div class="content-top">
-          <span class="must">*</span>
-          <span class="news">图片上传 :</span>
-          <input class="butto" type="file">
-          <input class="gitup">
-          <img class="gitup-img" src="../../assets/images/goup.png" alt>
-          <span class="font">上传文件</span>
-          <p class="Jurisdiction">支持扩展名：.doc .docx .pdf .jpg...</p>
-          <img class="content-img" src="../../assets/images/img.png" alt>
-          <div class="footer">
-            <span class="abolish">取消</span>
-            <span class="determine">确定</span>
-          </div>
-        </div>
-      </div>
-      <div class="modal" style="z-index: 2010;"></div>
-    </div>
-    <!-- 结束 -->
   </div>
 </template>
 
@@ -435,7 +392,7 @@ export default {
       coverFileArtist: '', // 艺人封面预览
       portrait: [], // 艺人写真
       coverFilePortraits: [], // 艺人写真预览
-      coverFilePortrait: '',
+      updatePortrait: -1, // 修改艺人写真参数信息
       isPerformerShow: false,
       work: 0, // 热门作品id
       event: 0, // 参加活动id
@@ -445,11 +402,15 @@ export default {
       EventDetail: [], // 艺人参加活动详情
       isPerformerShowHot: false,
       isPerformerShowHotPicter: false,
+      coverFilePortrait: '', // 活动封面图预览
       eventPic: '', // 活动封面图文件
       coverFileHot: '', // 封面（预览）
       workPic: '', // 作品封面图文件
       coverFileHots: '', // 视频（预览）
       workVideo: '', // 视频文件
+      seenPicfile: false,
+      seenBackfile: false,
+      seenPortrait: false,
       seenWork: false,
       seenEvent: false,
       current: 0, // 控制鼠标悬浮时的显示和隐藏
@@ -480,6 +441,8 @@ export default {
         if (res.data.data.artist_photo) {
           this.coverFilePortraits = JSON.parse(res.data.data.artist_photo) // 艺人写真预览
         }
+        console.log(res.data.data.artist_photo)
+        console.log(this.coverFilePortraits)
       })
       // 热门作品列表
       this.$axios.request({
@@ -646,10 +609,6 @@ export default {
         }
       }
     },
-    choiceCover () {
-      console.log('点击了上传视频')
-      this.$refs.choiceCoverElem.dispatchEvent(new MouseEvent('click'))
-    },
     // 艺人热门作品添加修改操作
     SaveWorkList () {
       let formData = new FormData()
@@ -794,6 +753,9 @@ export default {
         }
       }
     },
+    choiceCover () {
+      this.$refs.choiceCoverElem.dispatchEvent(new MouseEvent('click'))
+    },
     onCoverArtist (e) {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
@@ -814,6 +776,10 @@ export default {
         }
       }
     },
+    choiceCovers () {
+      this.$refs.choiceCoverElems.dispatchEvent(new MouseEvent('click'))
+    },
+    // 艺人写真图片上传
     onCoverPortrait (e) {
       let _file = e.target.files
       this.portrait = _file
@@ -835,12 +801,43 @@ export default {
         }
       }
     },
-    choiceCovers () {
-      console.log('点击了上传视频')
-      this.$refs.choiceCoverElems.dispatchEvent(new MouseEvent('click'))
+    choiceCoverPortrait (index) {
+      this.updatePortrait = index
+      this.$refs.choiceCoverElemUpdate.dispatchEvent(new MouseEvent('click'))
     },
-    closeCoverUpActor () {
-      console.log(123)
+    onCoverPortraits (e) {
+      let _file = e.target.files
+      this.portrait = _file
+      let _this = this
+      if (!e || !window.FileReader) {
+        return
+      }// 看支持不支持FileReader\
+      for (let i = 0; i < _file.length; i++) {
+        if (_file[i].size > 1024 * 1024) {
+          this.portraitText = '每张图片大小请小于1M'
+          return false
+        } else {
+          this.portraitText = ''
+        }
+        let reader = new FileReader()
+        reader.readAsDataURL(_file[i])
+        reader.onloadend = function () {
+          _this.$set(_this.coverFilePortraits, _this.updatePortrait, this.result)
+          let artistPhoto = JSON.parse(_this.artistInfo.artist_photo)
+          artistPhoto.splice(_this.updatePortrait, 1)
+          _this.artistInfo.artist_photo = JSON.stringify(artistPhoto)
+          _this.updatePortrait = -1
+        }
+      }
+    },
+    // 艺人写真图片删除
+    artistPhotoRemove (index) {
+      if (this.artistInfo.artist_photo && JSON.parse(this.artistInfo.artist_photo).length > index) {
+        let artistPhoto = JSON.parse(this.artistInfo.artist_photo)
+        artistPhoto.splice(index, 1)
+        this.artistInfo.artist_photo = JSON.stringify(artistPhoto)
+      }
+      this.coverFilePortraits.splice(index, 1)
     },
     artistAdd () {
       // 基本信息验证是否为空
@@ -946,17 +943,34 @@ export default {
         }
       })
     },
+    // 艺人首页，艺人封面鼠标移入时触发事件
+    fileOnMouseOver (type) {
+      if (this.artist > 0) {
+        if (type === 1) {
+          this.seenPicfile = true
+        } else if (type === 2) {
+          this.seenBackfile = true
+        }
+      }
+    },
+    fileOnMouseOut () {
+      this.seenPicfile = false
+      this.seenBackfile = false
+    },
     // 鼠标浮动移入触发事件
     onMouseover (index, type) {
       if (type === 1) {
         this.seenWork = true
       } else if (type === 2) {
         this.seenEvent = true
+      } else if (type === 3) {
+        this.seenPortrait = true
       }
       this.current = index
     },
     // 鼠标浮动移出触发事件
     onMouseout () {
+      this.seenPortrait = false
       this.seenWork = false
       this.seenEvent = false
       this.current = null
@@ -989,6 +1003,7 @@ export default {
 .more_picter {
   width: 1px;
   margin-left: 114px;
+  position:relative
 }
 .introduce {
   height: 94px;
@@ -1097,7 +1112,7 @@ export default {
   text-align: center;
   object-fit: cover;
   position: absolute;
-  margin-left: -48.5px;
+  margin-left: -35.5px;
 }
 .add-back {
   width: 97px;
@@ -1107,6 +1122,7 @@ export default {
   margin-top: 14px;
   margin-left: 52px;
   text-align: center;
+    position:relative
 }
 .cover {
   opacity: 0;
@@ -1156,10 +1172,35 @@ export default {
   border-radius: 2px;
   text-align: center;
   object-fit: cover;
-  position: relative!important;
   margin-left: -99px!important;
-  margin-top: 43px!important;
+  margin-top: 27px!important;
+    position:absolute;
+    z-index: 0;
 }
+.portrait-all{
+    width: 97px;
+    height: 146px;
+    border-radius: 2px;
+    text-align: center;
+    object-fit: cover;
+    margin-left: -99px!important;
+    margin-top: 27px!important;
+    position:absolute;
+    z-index: 1;
+    background:rgba(0,0,0,0.5);
+}
+  .portrait-all div{
+      width:28px;
+      height:28px;
+      font-size: 10px;
+      background:rgba(153,153,153,1);
+      opacity:0.9;
+      border-radius:50%;
+      margin: 0 auto;
+      text-align: center;
+      line-height:28px;
+      color:rgba(255,255,255,1);
+  }
 .award {
   background: #fff;
   border-radius: 2px;
@@ -1236,6 +1277,47 @@ export default {
 .tiansin {
   padding-bottom: 48px;
 }
+  .exhibition{
+      width: 97px;
+      height: 146px;
+      position:absolute;
+  }
+  .exhibitions{
+      width: 97px;
+      height: 146px;
+      position:absolute;
+      z-index:1;
+      background:rgba(0,0,0,0.5);
+  }
+  .coverPhoto{
+      width: 346px;
+      height: 105px;
+      position:absolute;
+  }
+  .coverPhotos{
+      width: 346px;
+      height: 105px;
+      position:absolute;
+      z-index:1;
+      background:rgba(0,0,0,0.5);
+  }
+  .replace{
+      width:32px;
+      height:32px;
+      background:rgba(153,153,153,1);
+      opacity:0.9;
+      border-radius:50%;
+      margin: 0 auto;
+      text-align: center;
+      line-height:30px;
+      color:rgba(255,255,255,1);
+      font-size: 12px;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      cursor:pointer;
+  }
     .add-awards {
         width: 74px;
         background: rgba(230, 230, 230, 1);
