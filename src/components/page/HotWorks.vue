@@ -90,6 +90,7 @@
           <span class="must">*</span>
           <span class="news">作品名称 :</span>
           <input class="butto" type="text" placeholder="请输入作品名称" v-model="WorkDetail.works">
+            <span class="wrongs">{{WorkText}}</span>
         </div>
         <div class="content-news">
           <span class="must"></span>
@@ -139,6 +140,7 @@
           <span class="must">*</span>
           <span class="news">活动标题 :</span>
           <input class="butto" type="text" placeholder="请输入活动标题" v-model="EventDetail.title">
+            <span class="wrongs">{{EventText}}</span>
         </div>
         <div class="content-news">
           <span class="must">*</span>
@@ -157,7 +159,7 @@
           <input class="butto" type="file" @change="onCoverPortrait">
           <input class="gitup">
           <img class="gitup-img" src="../../assets/images/goup.png" alt>
-          <span class="font">上传文件</span>
+          <span class="font">上传封面</span>
           <p class="Jurisdiction">支持扩展名：.doc .docx .pdf .jpg...</p>
           <div class="content-pict">
             <img class="pict" :src="coverFilePortrait" @click="choiceCover" alt>
@@ -196,7 +198,9 @@ export default {
       workVideo: '', // 作品视频文件
       seenWork: false,
       seenEvent: false,
-      current: 0 // 控制显示和隐藏
+      current: 0, // 控制显示和隐藏
+      WorkText: '',
+      EventText: ''
     }
   },
   mounted () {
@@ -381,6 +385,24 @@ export default {
     },
     // 艺人热门作品添加修改操作
     SaveWorkList () {
+      if (!this.WorkDetail.works) {
+        this.WorkText = '请填写作品名称'
+        return false
+      } else {
+        this.WorkText = ''
+      }
+      if (!this.workPic) {
+        this.WorkText = '请上传作品封面'
+        return false
+      } else {
+        this.WorkText = ''
+      }
+      if (!this.workVideo) {
+        this.WorkText = '请上传作品视频'
+        return false
+      } else {
+        this.WorkText = ''
+      }
       let formData = new FormData()
       formData.append('artist_id', this.artist) // 艺人id
       formData.append('work_id', this.work) // 作品id
@@ -454,6 +476,24 @@ export default {
     },
     // 艺人出席活动添加修改操作
     SaveEventList () {
+      if (!this.EventDetail.title) {
+        this.EventText = '请填写活动标题'
+        return false
+      } else {
+        this.EventText = ''
+      }
+      if (!this.EventDetail.jump_link) {
+        this.EventText = '请填写活动链接'
+        return false
+      } else {
+        this.EventText = ''
+      }
+      if (!this.eventPic) {
+        this.EventText = '请上传活动封面'
+        return false
+      } else {
+        this.EventText = ''
+      }
       let formData = new FormData()
       formData.append('artist_id', this.artist) // 艺人id
       formData.append('event_id', this.event) // 出席活动id
@@ -780,5 +820,11 @@ export default {
       top: 50%;
       transform: translate(-50%, -50%);
       cursor:pointer
+  }
+  .wrongs{
+      margin-left: 120px;
+      font-size:12px;
+      font-weight:400;
+      color:rgba(255,85,85,1)
   }
 </style>

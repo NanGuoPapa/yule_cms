@@ -28,7 +28,7 @@
               <td>{{(peoplePage.pageCurrent - 1) * peoplePage.pageSize + 1 + index}}</td>
               <td>{{item.artist_name}}</td>
               <td>{{item.weibo_name}}</td>
-              <td>{{item.ctime}}</td>
+              <td>{{item.ctime | formatDate}}</td>
               <td>{{item.artist_introduction}}</td>
               <td class="look">
                 <a href="javascript:;" @click="Details">查看详情 </a>
@@ -59,6 +59,25 @@ export default {
       pageCurrent: ''
     }
   },
+  filters: {
+    formatDate: function (value) {
+      value *= 1000
+      let date = new Date(value)
+      // 注意对方给你的是毫秒还是秒，如果是毫秒需要转秒（*1000）
+      let y = date.getFullYear()
+      let MM = date.getMonth() + 1
+      MM = MM < 10 ? ('0' + MM) : MM
+      let d = date.getDate()
+      d = d < 10 ? ('0' + d) : d
+      let h = date.getHours()
+      h = h < 10 ? ('0' + h) : h
+      let m = date.getMinutes()
+      m = m < 10 ? ('0' + m) : m
+      let s = date.getSeconds()
+      s = s < 10 ? ('0' + s) : s
+      return y + '-' + MM + '-' + d + ' ' + h + ':' + m + ':' + s
+    }
+  },
   methods: {
     // 分页请求
     handleCurrentChange (val) {
@@ -81,8 +100,10 @@ export default {
         data: formData
       }).then((res) => {
         // 处理请求结果
-        this.people = res.data.data.result
-        this.peoplePage = res.data.data.PageList
+        if (res.data.code === 200) {
+          this.people = res.data.data.result
+          this.peoplePage = res.data.data.PageList
+        }
       })
     },
     // 添加艺人
@@ -175,9 +196,11 @@ export default {
       url: 'actionArtistListApi',
       method: 'POST'
     }).then((res) => {
-      // 处理请求结果
-      this.people = res.data.data.result
-      this.peoplePage = res.data.data.PageList
+      if (res.data.code === 200) {
+        // 处理请求结果
+        this.people = res.data.data.result
+        this.peoplePage = res.data.data.PageList
+      }
     })
   }
 }

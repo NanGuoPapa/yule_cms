@@ -176,7 +176,7 @@
         </div>
       </div>
       <div  class="add-backs" :show-file-list="false">
-          <input class="cover" type="file" ref="choiceCoverElemUpdate" @change="onCoverPortraits" accept="image/*" multiple="multiple">
+          <input class="cover" type="file" ref="choiceCoverElemUpdate" @change="onCoverPortraits" accept="image/*">
           <input class="cover" type="file" ref="choiceCoverElemPortrait" @change="onCoverPortrait" accept="image/*" multiple="multiple">
         <span class="add-picter">+</span>
         <span class="add-picter">添加</span>
@@ -439,7 +439,7 @@ export default {
           this.experiences = JSON.parse(res.data.data.award_experience) // 平台信息
           this.coverFileReader = res.data.data.artist_cover// 艺人首页展示图预览
           this.coverFileArtist = res.data.data.artist_back// 艺人封面图图预览
-          if (res.data.data.artist_photo) {
+          if (res.data.data.artist_photo && res.data.data.artist_photo !== 'undefined') {
             this.coverFilePortraits = JSON.parse(res.data.data.artist_photo) // 艺人写真预览
           }
         }
@@ -825,7 +825,7 @@ export default {
     // 艺人写真图片上传
     onCoverPortrait (e) {
       let _file = e.target.files
-      this.portrait = _file
+      // this.portrait = _file
       let _this = this
       if (!e || !window.FileReader) {
         return
@@ -837,6 +837,7 @@ export default {
         } else {
           this.portraitText = ''
         }
+        this.portrait.push(_file[i])
         let reader = new FileReader()
         reader.readAsDataURL(_file[i])
         reader.onloadend = function () {
@@ -850,7 +851,7 @@ export default {
     },
     onCoverPortraits (e) {
       let _file = e.target.files
-      this.portrait = _file
+      // this.portrait = _file
       let _this = this
       if (!e || !window.FileReader) {
         return
@@ -862,13 +863,18 @@ export default {
         } else {
           this.portraitText = ''
         }
+        this.portrait.push(_file[i])
         let reader = new FileReader()
         reader.readAsDataURL(_file[i])
         reader.onloadend = function () {
           _this.$set(_this.coverFilePortraits, _this.updatePortrait, this.result)
-          let artistPhoto = JSON.parse(_this.artistInfo.artist_photo)
-          artistPhoto.splice(_this.updatePortrait, 1)
-          _this.artistInfo.artist_photo = JSON.stringify(artistPhoto)
+          if (_this.artistInfo.artist_photo && JSON.parse(_this.artistInfo.artist_photo).length > _this.updatePortrait) {
+            let artistPhoto = JSON.parse(_this.artistInfo.artist_photo)
+            artistPhoto.splice(_this.updatePortrait, 1)
+            _this.artistInfo.artist_photo = JSON.stringify(artistPhoto)
+          } else {
+            _this.portrait.splice(_this.updatePortrait, 1)
+          }
           _this.updatePortrait = -1
         }
       }
@@ -916,19 +922,19 @@ export default {
         this.contactText = ''
       }
       // 文件信息验证
-      if (!this.artistInfo.picfile && this.artist === 0) {
+      if (!this.picfile && this.artist === 0) {
         this.picfileText = '请上传艺人首页展示图'
         return false
       } else {
         this.picfileText = ''
       }
-      if (!this.artistInfo.backfile && this.artist === 0) {
+      if (!this.backfile && this.artist === 0) {
         this.backfileText = '请上传艺人封面图'
         return false
       } else {
         this.backfileText = ''
       }
-      if (!this.artistInfo.portrait && this.artist === 0) {
+      if (!this.portrait && this.artist === 0) {
         this.portraitText = '请上传艺人写真图'
         return false
       } else {
