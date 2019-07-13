@@ -892,18 +892,21 @@ export default {
       // 基本信息验证是否为空
       if (!this.artistInfo.artist_name) {
         this.basicText = '请输入艺人姓名'
+        this.$message.error('请输入艺人姓名')
         return false
       } else {
         this.basicText = ''
       }
       if (!this.artistInfo.artist_type) {
         this.basicText = '请输入艺人类型'
+        this.$message.error('请输入艺人类型')
         return false
       } else {
         this.basicText = ''
       }
       if (!this.artistInfo.artist_introduction) {
         this.basicText = '请输入艺人简介'
+        this.$message.error('请输入艺人简介')
         return false
       } else {
         this.basicText = ''
@@ -911,31 +914,36 @@ export default {
       // 联系方式验证是否为空
       if (!this.artistInfo.weibo_name) {
         this.contactText = '请输入微博姓名'
+        this.$message.error('请输入微博姓名')
         return false
       } else {
         this.contactText = ''
       }
       if (!this.artistInfo.weibo_link) {
         this.contactText = '请输入微博链接'
+        this.$message.error('请输入微博链接')
         return false
       } else {
         this.contactText = ''
       }
       // 文件信息验证
-      if (!this.picfile && this.artist === 0) {
+      if (!this.picfile || this.picfile === undefined && this.artist === 0) {
         this.picfileText = '请上传艺人首页展示图'
+        this.$message.error('请上传艺人首页展示图')
         return false
       } else {
         this.picfileText = ''
       }
-      if (!this.backfile && this.artist === 0) {
+      if (!this.backfile || this.backfile === undefined && this.artist === 0) {
         this.backfileText = '请上传艺人封面图'
+        this.$message.error('请上传艺人封面图')
         return false
       } else {
         this.backfileText = ''
       }
-      if (!this.portrait && this.artist === 0) {
+      if (!this.portrait || this.portrait === undefined && this.artist === 0) {
         this.portraitText = '请上传艺人写真图'
+        this.$message.error('请上传艺人写真图')
         return false
       } else {
         this.portraitText = ''
