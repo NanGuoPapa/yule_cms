@@ -927,21 +927,21 @@ export default {
         this.contactText = ''
       }
       // 文件信息验证
-      if (!this.picfile || this.picfile === undefined && this.artist === 0) {
+      if (this.picfile === undefined && this.artist === 0) {
         this.picfileText = '请上传艺人首页展示图'
         this.$message.error('请上传艺人首页展示图')
         return false
       } else {
         this.picfileText = ''
       }
-      if (!this.backfile || this.backfile === undefined && this.artist === 0) {
+      if (this.backfile === undefined && this.artist === 0) {
         this.backfileText = '请上传艺人封面图'
         this.$message.error('请上传艺人封面图')
         return false
       } else {
         this.backfileText = ''
       }
-      if (!this.portrait || this.portrait === undefined && this.artist === 0) {
+      if (this.portrait === undefined && this.artist === 0) {
         this.portraitText = '请上传艺人写真图'
         this.$message.error('请上传艺人写真图')
         return false
@@ -994,8 +994,8 @@ export default {
               this.$router.push({ path: '/allpeople' })
             } else {
               // 添加操作跳转至艺人作品和艺人活动页
-              this.$router.push({ path: '/HotWorks',
-                name: 'HotWorks',
+              this.$router.push({
+                path: '/HotWorks',
                 query: { artist: res.data.data.artist_id }
               })
             }
