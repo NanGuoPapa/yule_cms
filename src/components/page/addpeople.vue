@@ -281,6 +281,7 @@
           <span class="must">*</span>
           <span class="news">作品名称 :</span>
           <input class="butto" type="text" placeholder="请输入作品名称" v-model="WorkDetail.works">
+            <span class="wrongs">{{WorkText}}</span>
         </div>
         <div class="content-news">
           <span class="must"></span>
@@ -290,17 +291,17 @@
         <div class="content-top">
           <span class="must">*</span>
           <span class="news">上传文件 :</span>
-          <input class="butto" type="file" @change="onCoverHot">
+          <input class="butto" type="file" @change="onCoverHot" accept="image/jpeg, image/jpg, image/png">
 
           <input class="gitup">
           <img class="gitup-img" src="../../assets/images/goup.png" alt>
           <span class="font">上传封面</span>
-          <input class="buttos" type="file" @change="onCoverHots">
+          <input class="buttos" type="file" @change="onCoverHots" accept="audio/mp4, video/mp4">
           <input class="gitups">
           <img class="gitup-imgs" src="../../assets/images/goup.png" alt>
           <span class="fonts">上传视频</span>
-          <p class="Jurisdiction">支持扩展名：.doc .docx .pdf .jpg...</p>
-          <p class="Jurisdictions">支持扩展名：.doc .docx .pdf .jpg...</p>
+          <p class="Jurisdiction">支持扩展名：.jpeg .png .jpg</p>
+          <p class="Jurisdictions">支持扩展名：.mp4</p>
           <span class="cover-small">尺寸：400*600px</span>
           <span class="video-small">尺寸：400*600px</span>
           <div class="cover-picter">
@@ -330,6 +331,7 @@
           <span class="must">*</span>
           <span class="news">活动标题 :</span>
           <input class="butto" type="text" placeholder="请输入活动标题" v-model="EventDetail.title">
+            <span class="wrongs">{{EventText}}</span>
         </div>
         <div class="content-news">
           <span class="must">*</span>
@@ -344,11 +346,11 @@
         <div class="content-top">
           <span class="must">*</span>
           <span class="news">图片上传 :</span>
-          <input class="butto" type="file" @change="onCoverPortraitgo">
+          <input class="butto" type="file" @change="onCoverPortraitgo" accept="image/jpeg, image/jpg, image/png">
           <input class="gitup">
           <img class="gitup-img" src="../../assets/images/goup.png" alt>
           <span class="font">上传文件</span>
-          <p class="Jurisdiction">支持扩展名：.doc .docx .pdf .jpg...</p>
+          <p class="Jurisdiction">支持扩展名：.jpeg .png .jpg</p>
           <div class="content-pict">
             <img class="pict" :src="coverFilePortrait" @click="choiceCover" alt>
           </div>
@@ -418,7 +420,9 @@ export default {
       contactText: '', // 联系方式信息为空的警告信息
       picfileText: '', // 艺人首页展示警告信息
       backfileText: '', // 艺人封面展示警告信息
-      portraitText: '' // 艺人写真展示警告信息
+      portraitText: '', // 艺人写真展示警告信息
+      WorkText: '',
+      EventText: ''
     }
   },
   mounted () {
@@ -544,15 +548,10 @@ export default {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = ''
-        this.toast = this.$createToast({
-          time: 2000,
-          txt: '文件大小超过1M',
-          type: 'txt'
-        })
-        this.toast.show()
+        this.EventText = '文件大小超过1M'
         return false
       } else {
+        this.EventText = ''
         this.eventPic = _file
         let _this = this
         if (!e || !window.FileReader) {
@@ -570,15 +569,10 @@ export default {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024 * 40) {
-        this.$refs.videoElem.value = ''
-        this.toast = this.$createToast({
-          time: 2000,
-          txt: '文件大小超过40M',
-          type: 'txt'
-        })
-        this.toast.show()
+        this.WorkText = '文件大小超过40M'
         return false
       } else {
+        this.WorkText = ''
         this.workVideo = _file
         let _this = this
         if (!e || !window.FileReader) {
@@ -596,15 +590,10 @@ export default {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = ''
-        this.toast = this.$createToast({
-          time: 2000,
-          txt: '文件大小超过1M',
-          type: 'txt'
-        })
-        this.toast.show()
+        this.WorkText = '文件大小超过1M'
         return false
       } else {
+        this.WorkText = ''
         this.workPic = _file
         let _this = this
         if (!e || !window.FileReader) {
@@ -619,6 +608,24 @@ export default {
     },
     // 艺人热门作品添加修改操作
     SaveWorkList () {
+      if (!this.WorkDetail.works) {
+        this.WorkText = '请填写作品名称'
+        return false
+      } else {
+        this.WorkText = ''
+      }
+      if (!this.workPic) {
+        this.WorkText = '请上传作品封面'
+        return false
+      } else {
+        this.WorkText = ''
+      }
+      if (!this.workVideo) {
+        this.WorkText = '请上传作品视频'
+        return false
+      } else {
+        this.WorkText = ''
+      }
       let msg = '您确定提交吗?'
       this.$confirm(msg, '提示', {
         confirmButtonText: '确定',
@@ -691,6 +698,24 @@ export default {
     },
     // 艺人出席活动添加修改操作
     SaveEventList () {
+      if (!this.EventDetail.title) {
+        this.EventText = '请填写活动标题'
+        return false
+      } else {
+        this.EventText = ''
+      }
+      if (!this.EventDetail.jump_link) {
+        this.EventText = '请填写活动链接'
+        return false
+      } else {
+        this.EventText = ''
+      }
+      if (!this.eventPic) {
+        this.EventText = '请上传活动封面'
+        return false
+      } else {
+        this.EventText = ''
+      }
       let msg = '您确定提交吗?'
       this.$confirm(msg, '提示', {
         confirmButtonText: '确定',

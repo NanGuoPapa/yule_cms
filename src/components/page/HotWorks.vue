@@ -100,17 +100,17 @@
         <div class="content-top">
           <span class="must">*</span>
           <span class="news">上传文件 :</span>
-          <input class="butto" type="file" @change="onCoverHot">
+          <input class="butto" type="file" @change="onCoverHot" accept="image/jpeg, image/jpg, image/png">
 
           <input class="gitup">
           <img class="gitup-img" src="../../assets/images/goup.png" alt>
           <span class="font">上传封面</span>
-          <input class="buttos" type="file" @change="onCoverHots">
+          <input class="buttos" type="file" @change="onCoverHots" accept="audio/mp4, video/mp4">
           <input class="gitups">
           <img class="gitup-imgs" src="../../assets/images/goup.png" alt>
           <span class="fonts">上传视频</span>
-          <p class="Jurisdiction">支持扩展名：.doc .docx .pdf .jpg...</p>
-          <p class="Jurisdictions">支持扩展名：.doc .docx .pdf .jpg...</p>
+          <p class="Jurisdiction">支持扩展名：.jpeg .png .jpg</p>
+          <p class="Jurisdictions">支持扩展名：.mp4</p>
           <span class="cover-small">尺寸：400*600px</span>
           <span class="video-small">尺寸：400*600px</span>
           <div class="cover-picter">
@@ -156,11 +156,11 @@
         <div class="content-top">
           <span class="must">*</span>
           <span class="news">图片上传 :</span>
-          <input class="butto" type="file" @change="onCoverPortrait">
+          <input class="butto" type="file" @change="onCoverPortrait" accept="image/jpeg, image/jpg, image/png">
           <input class="gitup">
           <img class="gitup-img" src="../../assets/images/goup.png" alt>
           <span class="font">上传封面</span>
-          <p class="Jurisdiction">支持扩展名：.doc .docx .pdf .jpg...</p>
+          <p class="Jurisdiction">支持扩展名：.jpeg .png .jpg</p>
           <div class="content-pict">
             <img class="pict" :src="coverFilePortrait" @click="choiceCover" alt>
           </div>
@@ -306,15 +306,17 @@ export default {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = ''
-        this.toast = this.$createToast({
-          time: 2000,
-          txt: '文件大小超过1M',
-          type: 'txt'
-        })
-        this.toast.show()
+        // this.$refs.videoElem.value = ''
+        // this.toast = this.$createToast({
+        //   time: 2000,
+        //   txt: '文件大小超过1M',
+        //   type: 'txt'
+        // })
+        // this.toast.show()
+        this.EventText = '文件大小超过1M'
         return false
       } else {
+        this.EventText = ''
         this.eventPic = _file
         let _this = this
         if (!e || !window.FileReader) {
@@ -332,15 +334,10 @@ export default {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024 * 40) {
-        this.$refs.videoElem.value = ''
-        this.toast = this.$createToast({
-          time: 2000,
-          txt: '文件大小超过40M',
-          type: 'txt'
-        })
-        this.toast.show()
+        this.WorkText = '文件大小超过40M'
         return false
       } else {
+        this.WorkText = ''
         this.workVideo = _file
         let _this = this
         if (!e || !window.FileReader) {
@@ -358,15 +355,10 @@ export default {
       let _file = e.target.files[0]
       // 判断文件大小是否超出限制
       if (_file.size > 1024 * 1024) {
-        this.$refs.videoElem.value = ''
-        this.toast = this.$createToast({
-          time: 2000,
-          txt: '文件大小超过1M',
-          type: 'txt'
-        })
-        this.toast.show()
+        this.WorkText = '文件大小超过1M'
         return false
       } else {
+        this.WorkText = ''
         this.workPic = _file
         let _this = this
         if (!e || !window.FileReader) {
