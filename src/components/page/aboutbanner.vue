@@ -425,10 +425,7 @@ export default {
     z-index: 2011 !important;
   }
 
-  .el-message-box {
-    width: 800px;
-    height: 128px !important;
-  }
+
 
   .el-message-box__message textarea {
     margin-top: 24px;

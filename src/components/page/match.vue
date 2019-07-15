@@ -34,7 +34,6 @@
                 <a href="javascript:void(0);" @click="eventDel(item.id)">删除</a>
               </td>
             </tr>
-
             </tbody>
           </table>
         </div>
@@ -87,7 +86,6 @@
                 <img class="contentMatch" :src="coverFilePortraitMatch" @click="choiceCover" alt>
                 <span class="tip">{{msgcover_link}}</span>
               </div>
-
               <div class="footer">
                 <span class="abolish" @click="closeCoverUpMatch">取消</span>
                 <span class="determine" @click="eventCheck">确定</span>
@@ -231,7 +229,7 @@ export default {
     cancel () {
       this.default()
     },
-    eventDel (event_id) {
+    eventDel ( event_id ) {
       let msg = '您确定要删除吗?'
       this.$confirm(msg, '提示', {
         confirmButtonText: '确定',

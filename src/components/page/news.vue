@@ -44,7 +44,6 @@
         </div>
       </el-card>
     </div>
-
     <!-- 添加赛事弹框 -->
     <div v-show="isPerformerShow">
       <div class="elastic" style="z-index: 2011;">
@@ -139,7 +138,7 @@ export default {
       this.search()
     },
     // 点击显示弹窗
-    addNews (news_type, news_id) {
+    async addNews (news_type, news_id) {
       this.isPerformerShow = true
       if (news_type == 0) {
         this.topic = '添加新闻动态'

@@ -19,7 +19,7 @@ module.exports = {
   devServer: {
     proxy: {
       '/api': {
-        target: 'http://yule.tinsine.com/cms/', // 对应自己的接口
+        target: 'https://yule.tinsine.com/cms/', // 对应自己的接口
         changeOrigin: true,
         ws: true,
         pathRewrite: {
