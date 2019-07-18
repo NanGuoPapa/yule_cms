@@ -1034,12 +1034,10 @@ export default {
     },
     // 艺人首页，艺人封面鼠标移入时触发事件
     fileOnMouseOver (type) {
-      if (this.artist > 0) {
-        if (type === 1) {
-          this.seenPicfile = true
-        } else if (type === 2) {
-          this.seenBackfile = true
-        }
+      if (type === 1 && this.coverFileReader) {
+        this.seenPicfile = true
+      } else if (type === 2 && this.coverFileArtist) {
+        this.seenBackfile = true
       }
     },
     fileOnMouseOut () {
