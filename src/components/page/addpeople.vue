@@ -110,8 +110,8 @@
       <div class="contact">
         <div class="basic-big">
           <span class="basic-fill"></span>
-          <p class="basic-name">平台链接</p>
-          <input class="basic-input" type="text" placeholder="请选平台链接" v-model="items.link">
+          <p class="basic-name">平台ID</p>
+          <input class="basic-input" type="text" placeholder="请输入平台ID" v-model="items.link">
         </div>
       </div>
             <div class="add-input" @click="platform">
@@ -951,6 +951,16 @@ export default {
       } else {
         this.contactText = ''
       }
+      // 平台信息验证
+      this.platforms.forEach(item => {
+              if (!item.name || !item.link) {
+                  this.contactText = '请完善平台信息'
+                  this.$message.error('请完善平台信息')
+                  return false
+              } else {
+                  this.contactText = ''
+              }
+          })
       // 文件信息验证
       if (this.picfile === undefined && this.artist === 0) {
         this.picfileText = '请上传艺人首页展示图'
