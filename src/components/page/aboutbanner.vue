@@ -308,8 +308,12 @@ export default {
       } else {
         this.msgtitle = ''
       }
+      var url = /((ht|f)tps?:)\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/g
       if (!this.jump_link) {
         this.msgjump_link = '请填写链接地址'
+        return false
+      } else if (!url.test(this.jump_link)) {
+        this.msgjump_link = '跳转链接地址格式不正确'
         return false
       } else {
         this.msgjump_link = ''
@@ -418,14 +422,13 @@ export default {
     text-align: left !important;
   }
 
-  .el-message-box__wrapper{
-  z-index: 2013 !important;
+  .el-message-box__wrapper {
+    z-index: 2013 !important;
   }
-  .v-modal{
+
+  .v-modal {
     z-index: 2011 !important;
   }
-
-
 
   .el-message-box__message textarea {
     margin-top: 24px;
